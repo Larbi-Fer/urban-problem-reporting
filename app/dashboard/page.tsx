@@ -6,10 +6,12 @@ import { Report, Attachment } from '@/components/dashboard/types'
 import { DashboardFilters } from '@/components/dashboard/dashboard-filters'
 import { ReportsTable } from '@/components/dashboard/reports-table'
 import { ReportDrawer } from '@/components/dashboard/report-drawer'
+import { useRouter } from 'next/navigation'
 
 const supabase = createClient()
 
 export default function Dashboard() {
+    const router = useRouter()
     const [reports, setReports] = useState<Report[]>([])
     const [loading, setLoading] = useState(true)
     const [error, setError] = useState<string | null>(null)
@@ -19,9 +21,20 @@ export default function Dashboard() {
 
     const [selectedReport, setSelectedReport] = useState<Report | null>(null)
     const [isSheetOpen, setIsSheetOpen] = useState(false)
-    
+
     const [attachments, setAttachments] = useState<Attachment[]>([])
     const [attachmentsLoading, setAttachmentsLoading] = useState(false)
+
+    useEffect(() => {
+        (async () => {
+            const { data, error } = await supabase.auth.getUser()
+            if (error || !data.user) {
+                router.push('/auth/login')
+            } else if (data.user.user_metadata?.role !== 'admin') {
+                router.push('/issue')
+            }
+        })()
+    }, [])
 
     const fetchReports = async () => {
         setLoading(true)
@@ -54,7 +67,7 @@ export default function Dashboard() {
                 .from('attachments')
                 .select('*')
                 .eq('issue_id', issueId)
-            
+
             if (error) throw error
             setAttachments(data || [])
         } catch (err) {
@@ -72,7 +85,7 @@ export default function Dashboard() {
                 .eq('id', reportId)
 
             if (error) throw error
-            
+
             // Update local state
             setReports((prev) => prev.map((r) => r.id === reportId ? { ...r, status: newStatus } : r))
             if (selectedReport?.id === reportId) {
