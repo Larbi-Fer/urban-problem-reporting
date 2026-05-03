@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect } from 'react'
-import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet'
+import { MapContainer, TileLayer, Marker, Popup, useMapEvents } from 'react-leaflet'
 import 'leaflet/dist/leaflet.css'
 import L from 'leaflet'
 import { Report, statusMap, priorityMap } from '@/components/dashboard/types'
@@ -21,9 +21,28 @@ L.Marker.prototype.options.icon = DefaultIcon;
 
 interface MapViewerProps {
     reports: Report[]
+    onBoundsChange?: (bounds: L.LatLngBounds, center: L.LatLng) => void
 }
 
-export default function MapViewer({ reports }: MapViewerProps) {
+function MapEvents({ onBoundsChange }: { onBoundsChange?: (bounds: L.LatLngBounds, center: L.LatLng) => void }) {
+    const map = useMapEvents({
+        moveend: () => {
+            if (onBoundsChange) {
+                onBoundsChange(map.getBounds(), map.getCenter())
+            }
+        }
+    })
+
+    useEffect(() => {
+        if (map && onBoundsChange) {
+            onBoundsChange(map.getBounds(), map.getCenter())
+        }
+    }, [map, onBoundsChange])
+
+    return null
+}
+
+export default function MapViewer({ reports, onBoundsChange }: MapViewerProps) {
     // Default center for the map if no valid coordinates are found (e.g., Algiers)
     const defaultCenter: [number, number] = [36.7525, 3.04197]
 
@@ -45,6 +64,7 @@ export default function MapViewer({ reports }: MapViewerProps) {
                     attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
                     url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
                 />
+                <MapEvents onBoundsChange={onBoundsChange} />
                 {reports.map((report) => {
                     const coords = getCoordinates(report.location)
                     if (!coords) return null
@@ -79,7 +99,7 @@ export default function MapViewer({ reports }: MapViewerProps) {
     )
 }
 
-function getCoordinates(locationStr: string): [number, number] | null {
+export function getCoordinates(locationStr: string): [number, number] | null {
     if (!locationStr) return null;
     try {
         const parsed = JSON.parse(locationStr)
