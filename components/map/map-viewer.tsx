@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect } from 'react'
-import { MapContainer, TileLayer, Marker, Popup, useMapEvents } from 'react-leaflet'
+import { MapContainer, TileLayer, Marker, Popup, useMapEvents, useMap } from 'react-leaflet'
 import 'leaflet/dist/leaflet.css'
 import L from 'leaflet'
 import { Report, statusMap, priorityMap } from '@/components/dashboard/types'
@@ -22,6 +22,7 @@ L.Marker.prototype.options.icon = DefaultIcon;
 interface MapViewerProps {
     reports: Report[]
     onBoundsChange?: (bounds: L.LatLngBounds, center: L.LatLng) => void
+    selectedReportId?: string | null
 }
 
 function MapEvents({ onBoundsChange }: { onBoundsChange?: (bounds: L.LatLngBounds, center: L.LatLng) => void }) {
@@ -42,7 +43,27 @@ function MapEvents({ onBoundsChange }: { onBoundsChange?: (bounds: L.LatLngBound
     return null
 }
 
-export default function MapViewer({ reports, onBoundsChange }: MapViewerProps) {
+function MapFocus({ selectedReportId, reports }: { selectedReportId?: string | null, reports: Report[] }) {
+    const map = useMap()
+
+    useEffect(() => {
+        if (selectedReportId) {
+            const report = reports.find(r => r.id === selectedReportId)
+            if (report) {
+                const coords = getCoordinates(report.location)
+                if (coords) {
+                    map.flyTo(coords, 16, {
+                        duration: 1.5
+                    })
+                }
+            }
+        }
+    }, [selectedReportId, reports, map])
+
+    return null
+}
+
+export default function MapViewer({ reports, onBoundsChange, selectedReportId }: MapViewerProps) {
     // Default center for the map if no valid coordinates are found (e.g., Algiers)
     const defaultCenter: [number, number] = [36.7525, 3.04197]
 
@@ -65,6 +86,7 @@ export default function MapViewer({ reports, onBoundsChange }: MapViewerProps) {
                     url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
                 />
                 <MapEvents onBoundsChange={onBoundsChange} />
+                <MapFocus selectedReportId={selectedReportId} reports={reports} />
                 {reports.map((report) => {
                     const coords = getCoordinates(report.location)
                     if (!coords) return null
