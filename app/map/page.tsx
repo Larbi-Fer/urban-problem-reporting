@@ -29,10 +29,10 @@ function getDistance(lat1: number, lon1: number, lat2: number, lon2: number) {
     const R = 6371; // km
     const dLat = (lat2 - lat1) * Math.PI / 180;
     const dLon = (lon2 - lon1) * Math.PI / 180;
-    const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
-              Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
-              Math.sin(dLon/2) * Math.sin(dLon/2);
-    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+    const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+        Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+        Math.sin(dLon / 2) * Math.sin(dLon / 2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
     return R * c;
 }
 
@@ -54,16 +54,19 @@ export default function MapPage() {
     const [loading, setLoading] = useState(true)
     const [mapBounds, setMapBounds] = useState<any>(null) // Type will be L.LatLngBounds
     const [mapCenter, setMapCenter] = useState<any>(null) // Type will be L.LatLng
-    
+
+    const [openPanel, setOpenPanel] = useState(true)
+
     const supabase = createClient()
 
     useEffect(() => {
+        document.body.style.overflow = 'hidden'
         const fetchReports = async () => {
             try {
                 const { data, error } = await supabase
                     .from('reports')
                     .select('*')
-                
+
                 if (error) throw error
                 if (data) setReports(data)
             } catch (error) {
@@ -110,7 +113,16 @@ export default function MapPage() {
     return (
         <div className="w-full h-screen flex flex-col sm:flex-row bg-background overflow-hidden">
             {/* Sidebar for List */}
-            <div className="w-full sm:w-[400px] h-1/2 sm:h-full flex flex-col border-r bg-background/95 backdrop-blur z-10 shadow-xl relative order-2 sm:order-1">
+            <Button onClick={() => setOpenPanel(!openPanel)} variant='secondary'
+                className={`absolute top-1/2 hidden sm:block h-20 w-5 bg-neutral-200/60 rounded-none z-20 p-0 transition-all duration-300 border-r border-2 border-gray-300 font-bold
+                    ${openPanel ? "right-[407px]" : "right-0 rotate-180"}`
+                }
+            >{'>'}</Button>
+            <div
+                className={`w-full sm:w-[400px] h-1/2 sm:h-[calc(100%-16px)] flex flex-col border-r bg-neutral-200/60 border-2 border-gray-300 backdrop-blur z-10 shadow-xl order-2 sm:order-1 absolute top-2 rounded-2xl overflow-auto transition-all duration-300
+                    ${openPanel ? "right-2" : "-right-[420px]"}`
+                }
+            >
                 <div className="p-4 border-b shrink-0 flex items-center gap-3">
                     <Link href="/dashboard">
                         <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full">
@@ -141,7 +153,7 @@ export default function MapPage() {
                             {visibleReports.map((report) => {
                                 const statusInfo = statusMap[report.status] || { label: 'Unknown', color: 'bg-gray-100 text-gray-800' }
                                 const priorityInfo = priorityMap[report.priority] || { label: 'Unknown', color: 'bg-gray-100 text-gray-800' }
-                                
+
                                 // Calculate distance for display
                                 let distStr = ""
                                 if (mapCenter) {
@@ -151,7 +163,7 @@ export default function MapPage() {
                                 }
 
                                 return (
-                                    <div key={report.id} className="p-4 rounded-xl border bg-card hover:bg-accent/50 transition-colors shadow-sm">
+                                    <div key={report.id} className="p-4 rounded-xl border bg-card/50 hover:bg-accent/50 transition-colors shadow-sm">
                                         <div className="flex justify-between items-start mb-2 gap-2">
                                             <h3 className="font-semibold text-sm line-clamp-2">{report.title}</h3>
                                             {distStr && <span className="text-[10px] text-muted-foreground font-medium shrink-0 bg-muted px-2 py-1 rounded-full">{distStr}</span>}
