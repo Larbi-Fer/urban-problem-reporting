@@ -30,7 +30,7 @@ export default function Dashboard() {
             const { data, error } = await supabase.auth.getUser()
             if (error || !data.user) {
                 router.push('/auth/login')
-            } else if (data.user.user_metadata?.role !== 'admin') {
+            } else if (data.user.user_metadata?.role === 'user') {
                 router.push('/issue')
             }
         })()
