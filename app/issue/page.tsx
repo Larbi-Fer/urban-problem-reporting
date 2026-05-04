@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { AlertCircle, CheckCircle2, Loader2, MapPin, Send } from 'lucide-react'
 
 import { createClient } from '@/lib/supabase/client'
@@ -18,6 +18,8 @@ import {
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { cn } from '@/lib/utils'
+import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 
 // ── Types ────────────────────────────────────────────────────────────────────
 type FormStatus = 'idle' | 'submitting' | 'success' | 'error'
@@ -33,6 +35,8 @@ export default function ReportProblemPage() {
     const [status, setStatus] = useState<FormStatus>('idle')
     const [errorMsg, setErrorMsg] = useState('')
     const [issueId, setIssueId] = useState<string | null>(null)
+    const [user, setUser] = useState<any>(null)
+    const router = useRouter()
 
     const uploadProps = useSupabaseUpload({
         bucketName: 'Attachments',
@@ -42,6 +46,16 @@ export default function ReportProblemPage() {
         maxFiles: 10,
         upsert: true,
     })
+
+    useEffect(() => {
+        (async () => {
+            const { data: { user } } = await supabase.auth.getUser()
+            if (!user) {
+                return router.push('/login')
+            }
+            setUser(user)
+        })()
+    }, [])
 
     const isSubmitting = status === 'submitting'
     const isSuccess = status === 'success'
@@ -54,12 +68,10 @@ export default function ReportProblemPage() {
         setErrorMsg('')
 
         try {
-            const { data: { user } } = await supabase.auth.getUser()
-            const userId = user?.id
             // 1. Insert the report into the `reports` table
             const { data, error } = await supabase
                 .from('reports')
-                .insert({ title: title.trim(), description: description.trim(), location: location.trim(), reporter_id: userId })
+                .insert({ title: title.trim(), description: description.trim(), location: location.trim(), reporter_id: user.id })
                 .select('id')
                 .single()
 
@@ -140,6 +152,28 @@ export default function ReportProblemPage() {
                         </CardHeader>
 
                         <CardContent className="flex flex-col gap-5 pt-5">
+                            <div className="flex flex-col gap-1.5">
+                                {/* See the account email and possibility to change it (redirect to /auth/login) */}
+                                <Label htmlFor="account-email">
+                                    Account Email <span className="text-destructive">*</span>
+                                </Label>
+                                {user && <div className="flex gap-2">
+                                    <Input
+                                        id="account-email"
+                                        value={user?.email}
+                                        disabled={true}
+                                        required
+                                        className="h-9"
+                                    />
+                                    <Link href="/auth/login">
+                                        <Button className="w-full" type='button'>
+                                            Change Account
+                                        </Button>
+                                    </Link>
+                                </div>
+                                }
+                            </div>
+
                             {/* Title */}
                             <div className="flex flex-col gap-1.5">
                                 <Label htmlFor="report-title">
