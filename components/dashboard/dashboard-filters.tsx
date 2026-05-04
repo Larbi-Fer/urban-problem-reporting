@@ -5,6 +5,9 @@ import {
     SelectTrigger,
     SelectValue,
 } from '@/components/ui/select'
+import Link from 'next/link'
+import { Button } from '../ui/button'
+import { MapIcon } from 'lucide-react'
 
 interface DashboardFiltersProps {
     statusFilter: string
@@ -21,6 +24,13 @@ export function DashboardFilters({
 }: DashboardFiltersProps) {
     return (
         <div className="flex flex-wrap gap-4">
+            <div className="w-40">
+                <Link href='/map'>
+                    <Button variant='default'>
+                        <MapIcon className='h-4 w-4 mr-2' />
+                        View on Map</Button>
+                </Link>
+            </div>
             <div className="w-40">
                 <Select value={statusFilter} onValueChange={setStatusFilter}>
                     <SelectTrigger>
