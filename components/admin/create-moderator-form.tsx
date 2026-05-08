@@ -51,14 +51,14 @@ export function CreateModeratorForm({ className, ...props }: React.ComponentProp
         email,
         password,
         options: {
-          emailRedirectTo: `${window.location.origin}/protected`,
+          emailRedirectTo: `${window.location.origin}/issue`,
           data: {
             role: 'modirator'
           }
         }
       })
       if (error) throw error
-      
+
       setSuccess('Moderator created successfully! A confirmation email has been sent.')
       setEmail('')
       setPassword('')
