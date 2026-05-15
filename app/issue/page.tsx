@@ -107,7 +107,7 @@ export default function ReportProblemPage() {
     // ── Success State ────────────────────────────────────────────────────────
     if (isSuccess) {
         return (
-            <main className="min-h-screen bg-gradient-to-br from-background via-background to-muted/30 flex items-center justify-center p-4 sm:p-8">
+            <main className="min-h-screen bg-linear-to-br from-background via-background to-muted/30 flex items-center justify-center p-4 sm:p-8">
                 <div className="w-full max-w-md text-center">
                     <div className="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-full bg-primary/10 ring-1 ring-primary/20">
                         <CheckCircle2 className="h-10 w-10 text-primary" />
@@ -129,7 +129,7 @@ export default function ReportProblemPage() {
 
     // ── Form ─────────────────────────────────────────────────────────────────
     return (
-        <main className="min-h-screen bg-gradient-to-br from-background via-background to-muted/30 flex items-center justify-center p-4 sm:p-8">
+        <main className="min-h-screen bg-linear-to-br from-background via-background to-muted/30 flex items-center justify-center p-4 sm:p-8">
             <div className="w-full max-w-xl">
                 {/* Header */}
                 <div className="mb-8 text-center">
