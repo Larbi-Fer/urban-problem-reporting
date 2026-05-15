@@ -107,6 +107,12 @@ export default function MapPage() {
         }
     }
 
+    const handleReportSelect = (report: Report) => {
+        setSelectedReport(report)
+        setOpenPanel(true)
+        fetchAttachments(report.id)
+    }
+
     const handleUpdateStatus = async (reportId: string, newStatus: number) => {
         try {
             const { error } = await supabase
@@ -262,7 +268,12 @@ export default function MapPage() {
 
             {/* Map Area */}
             <div className="flex-1 w-full h-1/2 sm:h-full z-0 order-1 sm:order-2">
-                <MapViewer reports={reports} onBoundsChange={handleBoundsChange} selectedReportId={selectedReport?.id} />
+                <MapViewer
+                    reports={reports}
+                    onBoundsChange={handleBoundsChange}
+                    selectedReportId={selectedReport?.id}
+                    onReportSelect={handleReportSelect}
+                />
             </div>
         </div>
     )

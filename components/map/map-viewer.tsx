@@ -23,6 +23,7 @@ interface MapViewerProps {
     reports: Report[]
     onBoundsChange?: (bounds: L.LatLngBounds, center: L.LatLng) => void
     selectedReportId?: string | null
+    onReportSelect?: (report: Report) => void
 }
 
 function MapEvents({ onBoundsChange }: { onBoundsChange?: (bounds: L.LatLngBounds, center: L.LatLng) => void }) {
@@ -63,7 +64,7 @@ function MapFocus({ selectedReportId, reports }: { selectedReportId?: string | n
     return null
 }
 
-export default function MapViewer({ reports, onBoundsChange, selectedReportId }: MapViewerProps) {
+export default function MapViewer({ reports, onBoundsChange, selectedReportId, onReportSelect }: MapViewerProps) {
     // Default center for the map if no valid coordinates are found (e.g., Algiers)
     const defaultCenter: [number, number] = [36.7525, 3.04197]
 
@@ -95,7 +96,15 @@ export default function MapViewer({ reports, onBoundsChange, selectedReportId }:
                     const priorityInfo = priorityMap[report.priority] || { label: 'Unknown', color: 'bg-gray-100 text-gray-800' }
 
                     return (
-                        <Marker key={report.id} position={coords}>
+                        <Marker
+                            key={report.id}
+                            position={coords}
+                            eventHandlers={{
+                                click: () => {
+                                    if (onReportSelect) onReportSelect(report)
+                                }
+                            }}
+                        >
                             <Popup className="rounded-xl shadow-lg border-0 p-0 overflow-hidden min-w-[250px]">
                                 <div className="p-4 bg-background">
                                     <h3 className="font-semibold text-lg mb-2 text-foreground">{report.title}</h3>
