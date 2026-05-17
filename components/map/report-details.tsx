@@ -9,8 +9,86 @@ import {
     SelectTrigger,
     SelectValue,
 } from '@/components/ui/select'
-import { Loader2, Save, ArrowLeft } from 'lucide-react'
+import { Loader2, Save, ArrowLeft, ClipboardList, Search, Wrench, CheckCircle2 } from 'lucide-react'
 import { Report, Attachment, statusMap, priorityMap } from '../dashboard/types'
+import {
+    Timeline,
+    TimelineContent,
+    TimelineDate,
+    TimelineHeader,
+    TimelineIndicator,
+    TimelineItem,
+    TimelineSeparator,
+    TimelineTitle,
+} from '@/components/reui/timeline'
+
+function ReportTimeline({ report }: { report: Report }) {
+    const steps = [
+        {
+            label: 'Submitted',
+            description: 'Report received and logged.',
+            date: report.created_at,
+            icon: <ClipboardList className="h-2 w-2" />,
+        },
+        {
+            label: 'Under Investigation',
+            description: 'Authorities are reviewing the report.',
+            date: report.under_investigation_at,
+            icon: <Search className="h-2 w-2" />,
+        },
+        {
+            label: 'Work in Progress',
+            description: 'Active work has started on the issue.',
+            date: report.work_in_progress_at,
+            icon: <Wrench className="h-2 w-2" />,
+        },
+        {
+            label: 'Resolved',
+            description: 'The issue has been fully resolved.',
+            date: report.resolved_at,
+            icon: <CheckCircle2 className="h-2 w-2" />,
+        },
+    ]
+
+    const activeStep = steps.reduce((acc, step, idx) => (step.date ? idx + 1 : acc), 0)
+
+    return (
+        <Timeline value={activeStep} className="ps-2">
+            {steps.map((step, idx) => {
+                const done = !!step.date
+                return (
+                    <TimelineItem key={step.label} step={idx + 1}>
+                        <TimelineSeparator />
+                        <TimelineIndicator
+                            className={
+                                done
+                                    ? 'bg-primary border-primary flex items-center justify-center text-primary-foreground'
+                                    : 'bg-muted border-muted-foreground/30 flex items-center justify-center'
+                            }
+                        >
+                            <span className={done ? 'text-primary-foreground' : 'text-muted-foreground/40'}>
+                                {step.icon}
+                            </span>
+                        </TimelineIndicator>
+                        <TimelineHeader>
+                            <TimelineTitle className={`text-xs ${done ? 'text-foreground' : 'text-muted-foreground/60'}`}>
+                                {step.label}
+                            </TimelineTitle>
+                            {done && (
+                                <TimelineDate className="text-[10px]">
+                                    {new Date(step.date!).toLocaleString()}
+                                </TimelineDate>
+                            )}
+                        </TimelineHeader>
+                        <TimelineContent className={`text-[10px] ${done ? 'text-muted-foreground' : 'text-muted-foreground/40'}`}>
+                            {done ? step.description : 'Not started yet'}
+                        </TimelineContent>
+                    </TimelineItem>
+                )
+            })}
+        </Timeline>
+    )
+}
 
 interface ReportDetailsProps {
     report: Report | null
@@ -112,6 +190,11 @@ export function ReportDetails({
                     <div className="text-sm text-foreground bg-muted/80 p-3 rounded-md whitespace-pre-wrap">
                         {report.description || <span className="text-muted-foreground italic">No description provided.</span>}
                     </div>
+                </div>
+
+                <div>
+                    <h4 className="text-xs font-medium text-muted-foreground mb-2 uppercase tracking-wider">Progress Timeline</h4>
+                    <ReportTimeline report={report} />
                 </div>
 
                 <div>

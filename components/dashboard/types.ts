@@ -6,6 +6,9 @@ export type Report = {
     status: number
     priority: number
     created_at: string
+    under_investigation_at: string | null
+    work_in_progress_at: string | null
+    resolved_at: string | null
 }
 
 export type Attachment = {
