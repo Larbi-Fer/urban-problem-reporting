@@ -7,6 +7,7 @@ import { DashboardFilters } from '@/components/dashboard/dashboard-filters'
 import { ReportsTable } from '@/components/dashboard/reports-table'
 import { ReportDrawer } from '@/components/dashboard/report-drawer'
 import { useRouter } from 'next/navigation'
+import { MapPinIcon } from 'lucide-react'
 
 const supabase = createClient()
 

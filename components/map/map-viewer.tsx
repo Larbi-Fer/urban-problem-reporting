@@ -1,24 +1,37 @@
 'use client'
 
 import { useEffect } from 'react'
-import { MapContainer, TileLayer, Marker, Popup, useMapEvents, useMap } from 'react-leaflet'
+import { MapContainer, TileLayer, Marker, useMapEvents, useMap } from 'react-leaflet'
 import 'leaflet/dist/leaflet.css'
 import L from 'leaflet'
-import { Report, statusMap, priorityMap } from '@/components/dashboard/types'
-import { Badge } from '@/components/ui/badge'
+import { Report } from '@/components/dashboard/types'
 
-// Fix Leaflet default icon issue in Next.js
-const DefaultIcon = L.icon({
-    iconUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png',
-    iconRetinaUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png',
-    shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
-    iconSize: [25, 41],
-    iconAnchor: [12, 41],
-    popupAnchor: [1, -34],
-    shadowSize: [41, 41]
-});
-L.Marker.prototype.options.icon = DefaultIcon;
+// ----- Custom SVG marker icons -----
+// Leaflet requires L.DivIcon / L.Icon objects — React elements cannot be used here.
+function createMarkerIcon(selected: boolean): L.DivIcon {
+    const size = selected ? 36 : 28
+    const fill = selected ? '#f97316' : '#3b82f6'   // orange-500 : blue-500
+    const stroke = selected ? '#c2410c' : '#1d4ed8'  // orange-700 : blue-700
 
+    // Inline SVG string (no React, no JSX — pure HTML string for L.divIcon)
+    const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}" viewBox="0 0 24 24" fill="${fill}" stroke="${stroke}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M20 10c0 6-8 12-8 12S4 16 4 10a8 8 0 1 1 16 0Z"/>
+        <circle cx="12" cy="10" r="3" fill="white" stroke="none"/>
+    </svg>`
+
+    return L.divIcon({
+        html: svg,
+        className: '',
+        iconSize: [size, size],
+        iconAnchor: [size / 2, size],
+        popupAnchor: [0, -size],
+    })
+}
+
+const defaultIcon = createMarkerIcon(false)
+const selectedIcon = createMarkerIcon(true)
+
+// ----- Map sub-components -----
 interface MapViewerProps {
     reports: Report[]
     onBoundsChange?: (bounds: L.LatLngBounds, center: L.LatLng) => void
@@ -53,9 +66,7 @@ function MapFocus({ selectedReportId, reports }: { selectedReportId?: string | n
             if (report) {
                 const coords = getCoordinates(report.location)
                 if (coords) {
-                    map.flyTo(coords, 16, {
-                        duration: 1.5
-                    })
+                    map.flyTo(coords, 16, { duration: 1.5 })
                 }
             }
         }
@@ -64,22 +75,21 @@ function MapFocus({ selectedReportId, reports }: { selectedReportId?: string | n
     return null
 }
 
+// ----- Main component -----
 export default function MapViewer({ reports, onBoundsChange, selectedReportId, onReportSelect }: MapViewerProps) {
-    // Default center for the map if no valid coordinates are found (e.g., Algiers)
     const defaultCenter: [number, number] = [36.7525, 3.04197]
 
-    // Find the first report with valid coordinates to center the map
     const firstValidReport = reports.find(r => getCoordinates(r.location) !== null)
-    const mapCenter = firstValidReport 
-        ? getCoordinates(firstValidReport.location)! 
+    const mapCenter = firstValidReport
+        ? getCoordinates(firstValidReport.location)!
         : defaultCenter
 
     return (
         <div className="w-full h-full relative z-0">
-            <MapContainer 
-                center={mapCenter} 
-                zoom={12} 
-                scrollWheelZoom={true} 
+            <MapContainer
+                center={mapCenter}
+                zoom={12}
+                scrollWheelZoom={true}
                 className="w-full h-full absolute inset-0"
             >
                 <TileLayer
@@ -92,37 +102,20 @@ export default function MapViewer({ reports, onBoundsChange, selectedReportId, o
                     const coords = getCoordinates(report.location)
                     if (!coords) return null
 
-                    const statusInfo = statusMap[report.status] || { label: 'Unknown', color: 'bg-gray-100 text-gray-800' }
-                    const priorityInfo = priorityMap[report.priority] || { label: 'Unknown', color: 'bg-gray-100 text-gray-800' }
+                    const isSelected = report.id === selectedReportId
 
                     return (
                         <Marker
                             key={report.id}
                             position={coords}
+                            icon={isSelected ? selectedIcon : defaultIcon}
+                            zIndexOffset={isSelected ? 1000 : 0}
                             eventHandlers={{
                                 click: () => {
                                     if (onReportSelect) onReportSelect(report)
                                 }
                             }}
-                        >
-                            <Popup className="rounded-xl shadow-lg border-0 p-0 overflow-hidden min-w-[250px]">
-                                <div className="p-4 bg-background">
-                                    <h3 className="font-semibold text-lg mb-2 text-foreground">{report.title}</h3>
-                                    <p className="text-sm text-muted-foreground line-clamp-3 mb-4">{report.description}</p>
-                                    <div className="flex gap-2 flex-wrap">
-                                        <Badge variant="secondary" className={statusInfo.color}>
-                                            {statusInfo.label}
-                                        </Badge>
-                                        <Badge variant="outline" className={priorityInfo.color}>
-                                            {priorityInfo.label}
-                                        </Badge>
-                                    </div>
-                                    <div className="mt-3 text-xs text-muted-foreground/70">
-                                        Reported on {new Date(report.created_at).toLocaleDateString()}
-                                    </div>
-                                </div>
-                            </Popup>
-                        </Marker>
+                        />
                     )
                 })}
             </MapContainer>
@@ -138,7 +131,7 @@ export function getCoordinates(locationStr: string): [number, number] | null {
             return [parsed.latitude, parsed.longitude]
         }
     } catch (e) {
-        // If it's not valid JSON or fails to parse, return null
+        // Not valid JSON
     }
     return null
 }
