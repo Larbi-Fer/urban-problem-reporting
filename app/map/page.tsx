@@ -3,14 +3,13 @@
 import { useEffect, useState, useMemo, useCallback } from 'react'
 import dynamic from 'next/dynamic'
 import { createClient } from '@/lib/supabase/client'
-import { Report, statusMap, priorityMap } from '@/components/dashboard/types'
+import { Report, statusMap, priorityMap, Attachment } from '@/components/dashboard/types'
 import { Loader2, ArrowLeft, MapPin } from 'lucide-react'
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { ReportDetails } from '@/components/map/report-details'
-import { Attachment } from '@/components/dashboard/types'
 // We need to import getCoordinates type safely. Wait, getCoordinates is exported from map-viewer, but importing it directly from a dynamic component file might be problematic if it imports Leaflet on server.
 // It's safer to recreate getCoordinates here or move it to a utils file. I will recreate it here to avoid SSR issues with Leaflet from the map-viewer file.
 
@@ -115,16 +114,24 @@ export default function MapPage() {
 
     const handleUpdateStatus = async (reportId: string, newStatus: number) => {
         try {
+            const statusDate = {
+                ...(newStatus === 1 ? { under_investigation_at: new Date().toISOString() } : {}),
+                ...(newStatus === 2 ? { work_in_progress_at: new Date().toISOString() } : {}),
+                ...(newStatus === 3 ? { resolved_at: new Date().toISOString() } : {})
+            }
             const { error } = await supabase
                 .from('reports')
-                .update({ status: newStatus })
+                .update({
+                    status: newStatus,
+                    ...statusDate
+                })
                 .eq('id', reportId)
 
             if (error) throw error
 
-            setReports((prev) => prev.map((r) => r.id === reportId ? { ...r, status: newStatus } : r))
+            setReports((prev) => prev.map((r) => r.id === reportId ? { ...r, status: newStatus, ...statusDate } : r))
             if (selectedReport?.id === reportId) {
-                setSelectedReport({ ...selectedReport, status: newStatus })
+                setSelectedReport({ ...selectedReport, status: newStatus, ...statusDate })
             }
         } catch (err) {
             console.error('Failed to update status', err)

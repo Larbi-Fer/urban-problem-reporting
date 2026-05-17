@@ -154,14 +154,14 @@ export function ReportDetails({
                         <span className="text-xs font-medium text-muted-foreground">Status</span>
                         <div className="flex items-center gap-2">
                             <Select value={displayStatus} onValueChange={setEditedStatus}>
-                                <SelectTrigger className="w-[120px] h-7 text-xs">
+                                <SelectTrigger className="min-w-[120px] h-7 text-xs w-fit">
                                     <SelectValue />
                                 </SelectTrigger>
                                 <SelectContent>
                                     <SelectItem value="0">Open</SelectItem>
-                                    <SelectItem value="1">In Progress</SelectItem>
-                                    <SelectItem value="2">Resolved</SelectItem>
-                                    <SelectItem value="3">Closed</SelectItem>
+                                    <SelectItem value="1">Under Investigation</SelectItem>
+                                    <SelectItem value="2">Work in Progress</SelectItem>
+                                    <SelectItem value="3">Resolved</SelectItem>
                                 </SelectContent>
                             </Select>
                             {editedStatus !== null && editedStatus !== currentStatusStr && (

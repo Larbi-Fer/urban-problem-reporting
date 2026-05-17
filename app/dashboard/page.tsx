@@ -7,7 +7,6 @@ import { DashboardFilters } from '@/components/dashboard/dashboard-filters'
 import { ReportsTable } from '@/components/dashboard/reports-table'
 import { ReportDrawer } from '@/components/dashboard/report-drawer'
 import { useRouter } from 'next/navigation'
-import { MapPinIcon } from 'lucide-react'
 
 const supabase = createClient()
 
@@ -80,17 +79,25 @@ export default function Dashboard() {
 
     const handleUpdateStatus = async (reportId: string, newStatus: number) => {
         try {
+            const statusDate = {
+                ...(newStatus === 1 ? { under_investigation_at: new Date().toISOString() } : {}),
+                ...(newStatus === 2 ? { work_in_progress_at: new Date().toISOString() } : {}),
+                ...(newStatus === 3 ? { resolved_at: new Date().toISOString() } : {})
+            }
             const { error } = await supabase
                 .from('reports')
-                .update({ status: newStatus })
+                .update({
+                    status: newStatus,
+                    ...statusDate
+                })
                 .eq('id', reportId)
 
             if (error) throw error
 
             // Update local state
-            setReports((prev) => prev.map((r) => r.id === reportId ? { ...r, status: newStatus } : r))
+            setReports((prev) => prev.map((r) => r.id === reportId ? { ...r, status: newStatus, ...statusDate } : r))
             if (selectedReport?.id === reportId) {
-                setSelectedReport({ ...selectedReport, status: newStatus })
+                setSelectedReport({ ...selectedReport, status: newStatus, ...statusDate })
             }
         } catch (err) {
             console.error('Failed to update status', err)
