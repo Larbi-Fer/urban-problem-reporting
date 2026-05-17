@@ -132,7 +132,7 @@ export function ReportDetails({
     if (!report) return null
 
     return (
-        <div className="flex flex-col h-full bg-neutral-200/60">
+        <div className="flex flex-col h-full">
             <div className="p-4 border-b flex items-center gap-2 shrink-0">
                 {onBack && (
                     <Button variant="ghost" size="icon" onClick={onBack} className="h-8 w-8">
