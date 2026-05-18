@@ -18,6 +18,7 @@ export function CreateModeratorForm({ className, ...props }: React.ComponentProp
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [repeatPassword, setRepeatPassword] = useState('')
+  const [username, setUsername] = useState('')
   const [error, setError] = useState<string | null>(null)
   const [success, setSuccess] = useState<string | null>(null)
   const [isLoading, setIsLoading] = useState(false)
@@ -53,7 +54,8 @@ export function CreateModeratorForm({ className, ...props }: React.ComponentProp
         options: {
           emailRedirectTo: `${window.location.origin}/issue`,
           data: {
-            role: 'modirator'
+            role: 'team_leader',
+            name: username
           }
         }
       })
@@ -61,6 +63,7 @@ export function CreateModeratorForm({ className, ...props }: React.ComponentProp
 
       setSuccess('Moderator created successfully! A confirmation email has been sent.')
       setEmail('')
+      setUsername('')
       setPassword('')
       setRepeatPassword('')
     } catch (error: unknown) {
@@ -80,6 +83,17 @@ export function CreateModeratorForm({ className, ...props }: React.ComponentProp
         <CardContent>
           <form onSubmit={handleCreateModerator}>
             <div className="flex flex-col gap-6">
+              <div className="grid gap-2">
+                <Label htmlFor="username">Username</Label>
+                <Input
+                  id="username"
+                  type="text"
+                  placeholder="moderator"
+                  required
+                  value={username}
+                  onChange={(e) => setUsername(e.target.value)}
+                />
+              </div>
               <div className="grid gap-2">
                 <Label htmlFor="email">Email</Label>
                 <Input

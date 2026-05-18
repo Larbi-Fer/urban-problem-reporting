@@ -26,7 +26,7 @@ export function ModeratorsTable({ initialModerators }: ModeratorsTableProps) {
 
   const handleDelete = async (userId: string) => {
     if (!confirm('Are you sure you want to delete this moderator?')) return
-    
+
     setLoading(userId)
     try {
       await deleteUser(userId)
@@ -40,7 +40,7 @@ export function ModeratorsTable({ initialModerators }: ModeratorsTableProps) {
 
   const handlePasswordChange = async (userId: string) => {
     if (!newPassword) return
-    
+
     setLoading(userId)
     try {
       await updateUserPassword(userId, newPassword)
@@ -59,6 +59,7 @@ export function ModeratorsTable({ initialModerators }: ModeratorsTableProps) {
       <Table>
         <TableHeader>
           <TableRow>
+            <TableHead>Username</TableHead>
             <TableHead>Email</TableHead>
             <TableHead>Created At</TableHead>
             <TableHead className="text-right">Actions</TableHead>
@@ -74,6 +75,7 @@ export function ModeratorsTable({ initialModerators }: ModeratorsTableProps) {
           ) : (
             moderators.map((moderator) => (
               <TableRow key={moderator.id}>
+                <TableCell>{moderator.user_metadata?.name}</TableCell>
                 <TableCell>{moderator.email}</TableCell>
                 <TableCell>{new Date(moderator.created_at).toLocaleDateString()}</TableCell>
                 <TableCell className="text-right">
