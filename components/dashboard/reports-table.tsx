@@ -75,7 +75,7 @@ export function ReportsTable({ reports, loading, error, onRowClick, selectedId }
                         <TableRow
                             key={report.id}
                             className={cn("cursor-pointer hover:bg-muted/50 rise",
-                                selectedId === report.id && "bg-[linear-gradient(to_right,#eee8_0%,#eee2_16%,#eee8_33%,#eee2_50%,#eee8_66%,#eee2_83%,#eee8_100%)]")
+                                selectedId === report.id && "bg-[linear-gradient(to_right,#eee8_0%,#eee2_16%,#eee8_33%,#eee2_50%,#eee8_66%,#eee2_83%,#eee8_100%)] border-neutral-600/50 border-y-2")
                             }
                             style={{
                                 '--delay': `${i * 50}ms`
