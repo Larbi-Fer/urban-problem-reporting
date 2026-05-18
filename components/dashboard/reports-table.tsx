@@ -60,7 +60,7 @@ export function ReportsTable({ reports, loading, error, onRowClick, selectedId }
 
     return (
         <div className="rounded-md border bg-card bg-linear-to-br from-[#ccc2] via-white to-[#ccc2]">
-            <Table>
+            <Table className='overflow-hidden'>
                 <TableHeader>
                     <TableRow>
                         <TableHead>Title</TableHead>
@@ -71,12 +71,15 @@ export function ReportsTable({ reports, loading, error, onRowClick, selectedId }
                     </TableRow>
                 </TableHeader>
                 <TableBody>
-                    {reports.map((report) => (
+                    {reports.map((report, i) => (
                         <TableRow
                             key={report.id}
-                            className={cn("cursor-pointer hover:bg-muted/50",
+                            className={cn("cursor-pointer hover:bg-muted/50 rise",
                                 selectedId === report.id && "bg-[linear-gradient(to_right,#eee8_0%,#eee2_16%,#eee8_33%,#eee2_50%,#eee8_66%,#eee2_83%,#eee8_100%)]")
                             }
+                            style={{
+                                '--delay': `${i * 50}ms`
+                            } as React.CSSProperties}
                             onClick={() => onRowClick(report)}
                         >
                             <TableCell className="font-medium">{report.title}</TableCell>

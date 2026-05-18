@@ -213,7 +213,7 @@ export default function MapPage() {
                                 </div>
                             ) : (
                                 <div className="flex flex-col gap-3 pb-8">
-                                    {visibleReports.map((report) => {
+                                    {visibleReports.map((report, i) => {
                                         const statusInfo = statusMap[report.status] || { label: 'Unknown', color: 'bg-gray-100 text-gray-800' }
                                         const priorityInfo = priorityMap[report.priority] || { label: 'Unknown', color: 'bg-gray-100 text-gray-800' }
 
@@ -232,7 +232,10 @@ export default function MapPage() {
                                                     setSelectedReport(report)
                                                     fetchAttachments(report.id)
                                                 }}
-                                                className="p-4 rounded-xl border bg-card/50 hover:bg-accent/50 transition-colors shadow-sm cursor-pointer group"
+                                                className="p-4 rounded-xl border bg-card/50 hover:bg-accent/50 transition-colors shadow-sm cursor-pointer group rise"
+                                                style={{
+                                                    '--delay': `${i * 100}ms`
+                                                } as React.CSSProperties}
                                             >
                                                 <div className="flex justify-between items-start mb-2 gap-2">
                                                     <h3 className="font-semibold text-sm line-clamp-2 group-hover:text-primary transition-colors">{report.title}</h3>

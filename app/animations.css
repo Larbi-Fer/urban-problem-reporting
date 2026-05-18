@@ -1,0 +1,117 @@
+.d1 {
+    --delay: 100ms !important;
+}
+
+.d2 {
+    --delay: 200ms !important;
+}
+
+.d3 {
+    --delay: 300ms !important;
+}
+
+.d4 {
+    --delay: 400ms !important;
+}
+
+.d5 {
+    --delay: 500ms !important;
+}
+
+.d6 {
+    --delay: 600ms !important;
+}
+
+.d7 {
+    --delay: 700ms !important;
+}
+
+.d8 {
+    --delay: 800ms !important;
+}
+
+.d9 {
+    --delay: 900ms !important;
+}
+
+.d10 {
+    --delay: 1s !important;
+}
+
+
+.rise {
+    --delay: 0s;
+    animation: befor-rise var(--delay), rise .5s var(--delay);
+}
+
+@keyframes befor-rise {
+
+    0%,
+    100% {
+        transform: translateY(10px);
+        opacity: 0;
+    }
+}
+
+@keyframes rise {
+    0% {
+        transform: translateY(10px);
+        opacity: 0;
+    }
+
+    100% {
+        transform: translateY(0);
+        opacity: 100%;
+    }
+}
+
+
+
+.pan {
+    --delay: 0s;
+    animation: befor-pan var(--delay), pan .5s var(--delay);
+}
+
+@keyframes befor-pan {
+
+    0%,
+    100% {
+        transform: translateX(-10px);
+        opacity: 0;
+    }
+}
+
+@keyframes pan {
+    0% {
+        transform: translateX(-10px);
+        opacity: 0;
+    }
+
+    100% {
+        transform: translateX(0);
+        opacity: 100%;
+    }
+}
+
+.fade {
+    --delay: 0s;
+    animation: befor-fade var(--delay), fade .6s var(--delay);
+}
+
+@keyframes befor-fade {
+
+    0%,
+    100% {
+        opacity: 0;
+    }
+}
+
+@keyframes fade {
+    0% {
+        opacity: 0;
+    }
+
+    100% {
+        opacity: 100%;
+    }
+}

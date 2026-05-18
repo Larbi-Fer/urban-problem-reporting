@@ -24,14 +24,14 @@ export function DashboardFilters({
 }: DashboardFiltersProps) {
     return (
         <div className="flex flex-wrap gap-4">
-            <div className="w-40">
+            <div className="w-40 pan d1">
                 <Link href='/map'>
                     <Button variant='default'>
                         <MapIcon className='h-4 w-4 mr-2' />
                         View on Map</Button>
                 </Link>
             </div>
-            <div className="w-40">
+            <div className="w-40 pan d2">
                 <Select value={statusFilter} onValueChange={setStatusFilter}>
                     <SelectTrigger>
                         <SelectValue placeholder="Filter by Status" />
@@ -45,7 +45,7 @@ export function DashboardFilters({
                     </SelectContent>
                 </Select>
             </div>
-            <div className="w-40">
+            <div className="w-40 pan d3">
                 <Select value={priorityFilter} onValueChange={setPriorityFilter}>
                     <SelectTrigger>
                         <SelectValue placeholder="Filter by Priority" />
