@@ -9,15 +9,17 @@ import {
 import { Badge } from '@/components/ui/badge'
 import { Loader2, AlertCircle } from 'lucide-react'
 import { Report, statusMap, priorityMap } from './types'
+import { cn } from '@/lib/utils'
 
 interface ReportsTableProps {
     reports: Report[]
     loading: boolean
     error: string | null
     onRowClick: (report: Report) => void
+    selectedId?: string
 }
 
-export function ReportsTable({ reports, loading, error, onRowClick }: ReportsTableProps) {
+export function ReportsTable({ reports, loading, error, onRowClick, selectedId }: ReportsTableProps) {
     const formatLocation = (loc: string) => {
         if (!loc) return ''
         try {
@@ -57,7 +59,7 @@ export function ReportsTable({ reports, loading, error, onRowClick }: ReportsTab
     }
 
     return (
-        <div className="rounded-md border bg-card">
+        <div className="rounded-md border bg-card bg-linear-to-br from-[#ccc2] via-white to-[#ccc2]">
             <Table>
                 <TableHeader>
                     <TableRow>
@@ -72,7 +74,9 @@ export function ReportsTable({ reports, loading, error, onRowClick }: ReportsTab
                     {reports.map((report) => (
                         <TableRow
                             key={report.id}
-                            className="cursor-pointer hover:bg-muted/50"
+                            className={cn("cursor-pointer hover:bg-muted/50",
+                                selectedId === report.id && "bg-[linear-gradient(to_right,#eee8_0%,#eee2_16%,#eee8_33%,#eee2_50%,#eee8_66%,#eee2_83%,#eee8_100%)]")
+                            }
                             onClick={() => onRowClick(report)}
                         >
                             <TableCell className="font-medium">{report.title}</TableCell>

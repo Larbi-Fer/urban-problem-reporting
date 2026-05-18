@@ -168,7 +168,7 @@ export function ReportDrawer({
 
     return (
         <Sheet open={isOpen} onOpenChange={onOpenChange}>
-            <SheetContent className="!w-[40vw] !max-w-none sm:max-w-[60vh] md:max-w-4xl overflow-y-auto p-6 sm:p-10">
+            <SheetContent className="!w-[40vw] !max-w-none sm:max-w-[60vh] md:max-w-4xl overflow-y-auto p-6 sm:p-10 bg-white/60 backdrop-blur rounded-l-4xl">
                 <SheetHeader className="mb-6">
                     <SheetTitle className="text-2xl">{report?.title}</SheetTitle>
                     <SheetDescription>

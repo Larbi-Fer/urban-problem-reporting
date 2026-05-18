@@ -151,6 +151,7 @@ export default function Dashboard() {
                 loading={loading}
                 error={error}
                 onRowClick={handleRowClick}
+                selectedId={selectedReport?.id}
             />
 
             <ReportDrawer
