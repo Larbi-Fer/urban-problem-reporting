@@ -168,7 +168,9 @@ export function ReportDrawer({
 
     return (
         <Sheet open={isOpen} onOpenChange={onOpenChange}>
-            <SheetContent className="!w-[40vw] !max-w-none sm:max-w-[60vh] md:max-w-4xl overflow-y-auto p-6 sm:p-10 bg-white/60 backdrop-blur rounded-l-4xl">
+            <SheetContent className="!w-[40vw] border-primary/30 !max-w-none sm:max-w-[60vh] md:max-w-4xl overflow-y-auto p-6 sm:p-10 bg-white/60 backdrop-blur rounded-l-4xl">
+                {/* <div className='fixed top-0 left-0 w-0.5 h-full bg-[linear-gradient(to_bottom,oklch(0.553_0.195_38.402)_0%,oklch(0.62_0.17_42)_16%,oklch(0.72_0.12_48)_33%,oklch(0.82_0.06_55)_50%,oklch(0.72_0.12_48)_66%,oklch(0.62_0.17_42)_83%,oklch(0.553_0.195_38.402)_100%)]'></div> */}
+                {/* <div className='fixed top-0 left-0 w-0.5 h-full bg-[linear-gradient(to_bottom,var(--primary),white_16%,var(--primary)_33%,white_50%,var(--primary)_66%,white_83%,var(--primary)_100%)]'></div> */}
                 <SheetHeader className="mb-6">
                     <SheetTitle className="text-2xl">{report?.title}</SheetTitle>
                     <SheetDescription>
