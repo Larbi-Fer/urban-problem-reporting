@@ -9,6 +9,8 @@ export type Report = {
     under_investigation_at: string | null
     work_in_progress_at: string | null
     resolved_at: string | null
+    assigned_to_at: string | null
+    team_leader: string | null
 }
 
 export type Attachment = {

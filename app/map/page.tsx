@@ -112,10 +112,11 @@ export default function MapPage() {
         fetchAttachments(report.id)
     }
 
-    const handleUpdateStatus = async (reportId: string, newStatus: number) => {
+    const handleUpdateStatus = async (reportId: string, newStatus: number, teamLeaderId?: string | null) => {
         try {
             const statusDate = {
                 ...(newStatus === 1 ? { under_investigation_at: new Date().toISOString() } : {}),
+                ...(newStatus === 2 ? { assigned_to_at: new Date().toISOString(), team_leader: teamLeaderId } : {}),
                 ...(newStatus === 3 ? { work_in_progress_at: new Date().toISOString() } : {}),
                 ...(newStatus === 4 ? { resolved_at: new Date().toISOString() } : {})
             }
