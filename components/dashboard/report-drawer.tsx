@@ -13,7 +13,7 @@ import {
     SheetHeader,
     SheetTitle,
 } from '@/components/ui/sheet'
-import { Badge } from '@/components/ui/badge'
+
 import { Button } from '@/components/ui/button'
 import {
     Select,
@@ -23,7 +23,7 @@ import {
     SelectValue,
 } from '@/components/ui/select'
 import { Loader2, Save, ClipboardList, Search, Wrench, CheckCircle2 } from 'lucide-react'
-import { Report, Attachment, statusMap, priorityMap } from './types'
+import { Report, Attachment, statusMap } from './types'
 import {
     Timeline,
     TimelineContent,
@@ -111,6 +111,7 @@ interface ReportDrawerProps {
     onOpenChange: (open: boolean) => void
     getImageUrl: (path: string) => string
     onUpdateStatus: (reportId: string, newStatus: number) => Promise<void>
+    onUpdatePriority: (reportId: string, newPriority: number) => Promise<void>
 }
 
 export function ReportDrawer({
@@ -121,14 +122,19 @@ export function ReportDrawer({
     onOpenChange,
     getImageUrl,
     onUpdateStatus,
+    onUpdatePriority,
 }: ReportDrawerProps) {
     const [editedStatus, setEditedStatus] = useState<string | null>(null)
+    const [editedPriority, setEditedPriority] = useState<string | null>(null)
     const [isSaving, setIsSaving] = useState(false)
+    const [isSavingPriority, setIsSavingPriority] = useState(false)
 
     useEffect(() => {
         if (isOpen) {
             setEditedStatus(null)
+            setEditedPriority(null)
             setIsSaving(false)
+            setIsSavingPriority(false)
         }
     }, [isOpen, report?.id])
 
@@ -155,6 +161,9 @@ export function ReportDrawer({
     const currentStatusStr = report ? report.status.toString() : ''
     const displayStatus = editedStatus !== null ? editedStatus : currentStatusStr
 
+    const currentPriorityStr = report ? (report.priority ?? 0).toString() : ''
+    const displayPriority = editedPriority !== null ? editedPriority : currentPriorityStr
+
     const handleSaveStatus = async () => {
         if (!report || editedStatus === null) return
         setIsSaving(true)
@@ -163,6 +172,17 @@ export function ReportDrawer({
             setEditedStatus(null)
         } finally {
             setIsSaving(false)
+        }
+    }
+
+    const handleSavePriority = async () => {
+        if (!report || editedPriority === null) return
+        setIsSavingPriority(true)
+        try {
+            await onUpdatePriority(report.id, parseInt(editedPriority))
+            setEditedPriority(null)
+        } finally {
+            setIsSavingPriority(false)
         }
     }
 
@@ -187,10 +207,11 @@ export function ReportDrawer({
                                             <SelectValue />
                                         </SelectTrigger>
                                         <SelectContent>
-                                            <SelectItem value="0">Open</SelectItem>
+                                            <SelectItem value="0">New</SelectItem>
                                             <SelectItem value="1">Under Investigation</SelectItem>
-                                            <SelectItem value="2">Work in Progress</SelectItem>
-                                            <SelectItem value="3">Resolved</SelectItem>
+                                            <SelectItem value="2">Assign a leader</SelectItem>
+                                            <SelectItem value="3">Work in Progress</SelectItem>
+                                            <SelectItem value="4">Resolved</SelectItem>
                                         </SelectContent>
                                     </Select>
                                     {editedStatus !== null && editedStatus !== currentStatusStr && (
@@ -208,9 +229,30 @@ export function ReportDrawer({
                             </div>
                             <div className="flex items-center gap-3">
                                 <span className="text-sm font-medium text-muted-foreground w-16 sm:w-auto">Priority:</span>
-                                <Badge variant="outline" className={priorityMap[report.priority || 0]?.color}>
-                                    {priorityMap[report.priority || 0]?.label || 'Unknown'}
-                                </Badge>
+                                <div className="flex items-center gap-2">
+                                    <Select value={displayPriority} onValueChange={setEditedPriority}>
+                                        <SelectTrigger className="min-w-[120px] h-8 w-fit">
+                                            <SelectValue />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            <SelectItem value="0">Low</SelectItem>
+                                            <SelectItem value="1">Medium</SelectItem>
+                                            <SelectItem value="2">High</SelectItem>
+                                            <SelectItem value="3">Critical</SelectItem>
+                                        </SelectContent>
+                                    </Select>
+                                    {editedPriority !== null && editedPriority !== currentPriorityStr && (
+                                        <Button
+                                            size="sm"
+                                            onClick={handleSavePriority}
+                                            disabled={isSavingPriority}
+                                            className="h-8"
+                                        >
+                                            {isSavingPriority ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4 mr-1" />}
+                                            Save
+                                        </Button>
+                                    )}
+                                </div>
                             </div>
                         </div>
 

@@ -116,8 +116,8 @@ export default function MapPage() {
         try {
             const statusDate = {
                 ...(newStatus === 1 ? { under_investigation_at: new Date().toISOString() } : {}),
-                ...(newStatus === 2 ? { work_in_progress_at: new Date().toISOString() } : {}),
-                ...(newStatus === 3 ? { resolved_at: new Date().toISOString() } : {})
+                ...(newStatus === 3 ? { work_in_progress_at: new Date().toISOString() } : {}),
+                ...(newStatus === 4 ? { resolved_at: new Date().toISOString() } : {})
             }
             const { error } = await supabase
                 .from('reports')
@@ -135,6 +135,24 @@ export default function MapPage() {
             }
         } catch (err) {
             console.error('Failed to update status', err)
+        }
+    }
+
+    const handleUpdatePriority = async (reportId: string, newPriority: number) => {
+        try {
+            const { error } = await supabase
+                .from('reports')
+                .update({ priority: newPriority })
+                .eq('id', reportId)
+
+            if (error) throw error
+
+            setReports((prev) => prev.map((r) => r.id === reportId ? { ...r, priority: newPriority } : r))
+            if (selectedReport?.id === reportId) {
+                setSelectedReport({ ...selectedReport, priority: newPriority })
+            }
+        } catch (err) {
+            console.error('Failed to update priority', err)
         }
     }
 
@@ -269,6 +287,7 @@ export default function MapPage() {
                                 loading={attachmentsLoading}
                                 getImageUrl={getImageUrl}
                                 onUpdateStatus={handleUpdateStatus}
+                                onUpdatePriority={handleUpdatePriority}
                                 onBack={() => setSelectedReport(null)}
                             />
                         )}

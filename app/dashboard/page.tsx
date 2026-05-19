@@ -6,6 +6,7 @@ import { Report, Attachment } from '@/components/dashboard/types'
 import { DashboardFilters } from '@/components/dashboard/dashboard-filters'
 import { ReportsTable } from '@/components/dashboard/reports-table'
 import { ReportDrawer } from '@/components/dashboard/report-drawer'
+import { StatusCards } from '@/components/dashboard/status-cards'
 import { useRouter } from 'next/navigation'
 
 const supabase = createClient()
@@ -13,6 +14,7 @@ const supabase = createClient()
 export default function Dashboard() {
     const router = useRouter()
     const [reports, setReports] = useState<Report[]>([])
+    const [allReports, setAllReports] = useState<Report[]>([])
     const [loading, setLoading] = useState(true)
     const [error, setError] = useState<string | null>(null)
 
@@ -40,6 +42,10 @@ export default function Dashboard() {
         setLoading(true)
         setError(null)
         try {
+            // Fetch all reports for status cards (unfiltered)
+            const { data: allData } = await supabase.from('reports').select('*')
+            setAllReports(allData || [])
+
             let query = supabase.from('reports').select('*').order('created_at', { ascending: false })
 
             if (statusFilter !== 'all') {
@@ -81,8 +87,8 @@ export default function Dashboard() {
         try {
             const statusDate = {
                 ...(newStatus === 1 ? { under_investigation_at: new Date().toISOString() } : {}),
-                ...(newStatus === 2 ? { work_in_progress_at: new Date().toISOString() } : {}),
-                ...(newStatus === 3 ? { resolved_at: new Date().toISOString() } : {})
+                ...(newStatus === 3 ? { work_in_progress_at: new Date().toISOString() } : {}),
+                ...(newStatus === 4 ? { resolved_at: new Date().toISOString() } : {})
             }
             const { error } = await supabase
                 .from('reports')
@@ -96,12 +102,31 @@ export default function Dashboard() {
 
             // Update local state
             setReports((prev) => prev.map((r) => r.id === reportId ? { ...r, status: newStatus, ...statusDate } : r))
+            setAllReports((prev) => prev.map((r) => r.id === reportId ? { ...r, status: newStatus, ...statusDate } : r))
             if (selectedReport?.id === reportId) {
                 setSelectedReport({ ...selectedReport, status: newStatus, ...statusDate })
             }
         } catch (err) {
             console.error('Failed to update status', err)
-            // Ideally show a toast notification here
+        }
+    }
+
+    const handleUpdatePriority = async (reportId: string, newPriority: number) => {
+        try {
+            const { error } = await supabase
+                .from('reports')
+                .update({ priority: newPriority })
+                .eq('id', reportId)
+
+            if (error) throw error
+
+            setReports((prev) => prev.map((r) => r.id === reportId ? { ...r, priority: newPriority } : r))
+            setAllReports((prev) => prev.map((r) => r.id === reportId ? { ...r, priority: newPriority } : r))
+            if (selectedReport?.id === reportId) {
+                setSelectedReport({ ...selectedReport, priority: newPriority })
+            }
+        } catch (err) {
+            console.error('Failed to update priority', err)
         }
     }
 
@@ -146,6 +171,8 @@ export default function Dashboard() {
                 />
             </div>
 
+            <StatusCards reports={allReports} />
+
             <ReportsTable
                 reports={reports}
                 loading={loading}
@@ -162,6 +189,7 @@ export default function Dashboard() {
                 onOpenChange={handleSheetOpenChange}
                 getImageUrl={getImageUrl}
                 onUpdateStatus={handleUpdateStatus}
+                onUpdatePriority={handleUpdatePriority}
             />
         </div>
     )

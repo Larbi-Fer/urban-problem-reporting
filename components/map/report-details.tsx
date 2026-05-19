@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import dynamic from 'next/dynamic'
-import { Badge } from '@/components/ui/badge'
+
 import { Button } from '@/components/ui/button'
 import {
     Select,
@@ -10,7 +10,7 @@ import {
     SelectValue,
 } from '@/components/ui/select'
 import { Loader2, Save, ArrowLeft, ClipboardList, Search, Wrench, CheckCircle2 } from 'lucide-react'
-import { Report, Attachment, statusMap, priorityMap } from '../dashboard/types'
+import { Report, Attachment, statusMap } from '../dashboard/types'
 import {
     Timeline,
     TimelineContent,
@@ -96,6 +96,7 @@ interface ReportDetailsProps {
     loading: boolean
     getImageUrl: (path: string) => string
     onUpdateStatus: (reportId: string, newStatus: number) => Promise<void>
+    onUpdatePriority: (reportId: string, newPriority: number) => Promise<void>
     onBack?: () => void
 }
 
@@ -105,18 +106,26 @@ export function ReportDetails({
     loading,
     getImageUrl,
     onUpdateStatus,
+    onUpdatePriority,
     onBack
 }: ReportDetailsProps) {
     const [editedStatus, setEditedStatus] = useState<string | null>(null)
+    const [editedPriority, setEditedPriority] = useState<string | null>(null)
     const [isSaving, setIsSaving] = useState(false)
+    const [isSavingPriority, setIsSavingPriority] = useState(false)
 
     useEffect(() => {
         setEditedStatus(null)
+        setEditedPriority(null)
         setIsSaving(false)
+        setIsSavingPriority(false)
     }, [report?.id])
 
     const currentStatusStr = report ? report.status.toString() : ''
     const displayStatus = editedStatus !== null ? editedStatus : currentStatusStr
+
+    const currentPriorityStr = report ? (report.priority ?? 0).toString() : ''
+    const displayPriority = editedPriority !== null ? editedPriority : currentPriorityStr
 
     const handleSaveStatus = async () => {
         if (!report || editedStatus === null) return
@@ -126,6 +135,17 @@ export function ReportDetails({
             setEditedStatus(null)
         } finally {
             setIsSaving(false)
+        }
+    }
+
+    const handleSavePriority = async () => {
+        if (!report || editedPriority === null) return
+        setIsSavingPriority(true)
+        try {
+            await onUpdatePriority(report.id, parseInt(editedPriority))
+            setEditedPriority(null)
+        } finally {
+            setIsSavingPriority(false)
         }
     }
 
@@ -158,10 +178,11 @@ export function ReportDetails({
                                     <SelectValue />
                                 </SelectTrigger>
                                 <SelectContent>
-                                    <SelectItem value="0">Open</SelectItem>
+                                    <SelectItem value="0">New</SelectItem>
                                     <SelectItem value="1">Under Investigation</SelectItem>
-                                    <SelectItem value="2">Work in Progress</SelectItem>
-                                    <SelectItem value="3">Resolved</SelectItem>
+                                    <SelectItem value="2">Assign a leader</SelectItem>
+                                    <SelectItem value="3">Work in Progress</SelectItem>
+                                    <SelectItem value="4">Resolved</SelectItem>
                                 </SelectContent>
                             </Select>
                             {editedStatus !== null && editedStatus !== currentStatusStr && (
@@ -179,9 +200,30 @@ export function ReportDetails({
                     </div>
                     <div className="flex items-center justify-between">
                         <span className="text-xs font-medium text-muted-foreground">Priority</span>
-                        <Badge variant="outline" className={`text-[10px] h-5 ${priorityMap[report.priority || 0]?.color}`}>
-                            {priorityMap[report.priority || 0]?.label || 'Unknown'}
-                        </Badge>
+                        <div className="flex items-center gap-2">
+                            <Select value={displayPriority} onValueChange={setEditedPriority}>
+                                <SelectTrigger className="min-w-[110px] h-7 text-xs w-fit">
+                                    <SelectValue />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="0">Low</SelectItem>
+                                    <SelectItem value="1">Medium</SelectItem>
+                                    <SelectItem value="2">High</SelectItem>
+                                    <SelectItem value="3">Critical</SelectItem>
+                                </SelectContent>
+                            </Select>
+                            {editedPriority !== null && editedPriority !== currentPriorityStr && (
+                                <Button
+                                    size="sm"
+                                    onClick={handleSavePriority}
+                                    disabled={isSavingPriority}
+                                    className="h-7 px-2 text-[10px]"
+                                >
+                                    {isSavingPriority ? <Loader2 className="h-3 w-3 animate-spin" /> : <Save className="h-3 w-3 mr-1" />}
+                                    Save
+                                </Button>
+                            )}
+                        </div>
                     </div>
                 </div>
 
