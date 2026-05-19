@@ -4,6 +4,10 @@ import { useEffect, useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { Report } from '@/components/dashboard/types'
 import { MonthlyCards } from '@/components/statistics/monthly-cards'
+import { StatusDistributionChart } from '@/components/statistics/status-distribution-chart'
+import { MonthlyReportsChart } from '@/components/statistics/monthly-reports-chart'
+import { TasksEvolutionChart } from '@/components/statistics/tasks-evolution-chart'
+import { Skeleton } from '@/components/ui/skeleton'
 
 const supabase = createClient()
 
@@ -29,7 +33,30 @@ export default function Statistics() {
     }, [])
 
     if (loading) {
-        return <div className="p-8 flex justify-center items-center h-64"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900"></div></div>
+        return (
+            <div className="container mx-auto py-10 px-4 sm:px-8">
+                <div className="mb-6 fade">
+                    <Skeleton className="h-9 w-64 mb-2" />
+                    <Skeleton className="h-5 w-80" />
+                </div>
+                
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+                    {[1, 2, 3].map(i => <Skeleton key={i} className="h-[140px] w-full rounded-2xl" />)}
+                </div>
+
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-8">
+                    <div className="lg:col-span-1">
+                        <Skeleton className="h-[400px] w-full rounded-2xl" />
+                    </div>
+                    <div className="lg:col-span-1">
+                        <Skeleton className="h-[400px] w-full rounded-2xl" />
+                    </div>
+                    <div className="lg:col-span-2">
+                        <Skeleton className="h-[400px] w-full rounded-2xl" />
+                    </div>
+                </div>
+            </div>
+        )
     }
 
     if (error) {
@@ -44,6 +71,18 @@ export default function Statistics() {
             </div>
             
             <MonthlyCards reports={reports} />
+
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-8">
+                <div className="lg:col-span-1">
+                    <StatusDistributionChart reports={reports} />
+                </div>
+                <div className="lg:col-span-1">
+                    <MonthlyReportsChart reports={reports} />
+                </div>
+                <div className="lg:col-span-2">
+                    <TasksEvolutionChart reports={reports} />
+                </div>
+            </div>
         </div>
     )
 }
