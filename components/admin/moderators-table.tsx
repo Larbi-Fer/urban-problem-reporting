@@ -11,7 +11,7 @@ import {
 } from '@/components/ui/table'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { deleteUser, updateUserPassword } from '@/app/admin/moderators/actions'
+import { deleteUser, updateUserPassword } from '@/app/(root)/admin/team_leaders/actions'
 import { User } from '@supabase/supabase-js'
 
 interface ModeratorsTableProps {

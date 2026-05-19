@@ -20,7 +20,7 @@ import {
     DialogHeader,
     DialogTitle,
 } from '@/components/ui/dialog'
-import { getModerators } from '@/app/admin/moderators/actions'
+import { getModerators } from '@/app/(root)/admin/team_leaders/actions'
 
 import { Button } from '@/components/ui/button'
 import {

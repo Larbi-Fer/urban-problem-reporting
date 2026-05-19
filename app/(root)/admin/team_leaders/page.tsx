@@ -14,7 +14,7 @@ export default async function ModeratorsPage() {
           <h1 className="text-3xl font-bold tracking-tight">Team Leaders</h1>
           <p className="text-muted-foreground mt-1">Manage team leaders</p>
         </div>
-        <Link href="/admin/moderators/create">
+        <Link href="/admin/team_leaders/create">
           <button className="bg-primary text-primary-foreground hover:bg-primary/90 px-4 py-2 rounded-md font-medium transition-colors">
             Add Team Leader
           </button>
