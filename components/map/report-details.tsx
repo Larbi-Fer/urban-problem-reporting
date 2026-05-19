@@ -45,6 +45,12 @@ function ReportTimeline({ report }: { report: Report }) {
             icon: <Search className="h-2 w-2" />,
         },
         {
+            label: 'Leader assigned',
+            description: 'A team leader has been assigned to the report.',
+            date: report.assigned_to_at,
+            icon: <Wrench className="h-2 w-2" />,
+        },
+        {
             label: 'Work in Progress',
             description: 'Active work has started on the issue.',
             date: report.work_in_progress_at,
@@ -224,8 +230,8 @@ export function ReportDetails({
                                             <SelectItem value="0">New</SelectItem>
                                             <SelectItem value="1">Under Investigation</SelectItem>
                                             <SelectItem value="2">Assign a leader</SelectItem>
-                                            <SelectItem value="3">Work in Progress</SelectItem>
-                                            <SelectItem value="4">Resolved</SelectItem>
+                                            <SelectItem value="3" disabled>Work in Progress</SelectItem>
+                                            <SelectItem value="4" disabled>Resolved</SelectItem>
                                         </SelectContent>
                                     </Select>
                                     {editedStatus !== null && editedStatus !== currentStatusStr && (
@@ -276,13 +282,6 @@ export function ReportDetails({
                                     </Button>
                                 )}
                             </div>
-                        </div>
-                    </div>
-
-                    <div>
-                        <h4 className="text-xs font-medium text-muted-foreground mb-2 uppercase tracking-wider">Location</h4>
-                        <div className="text-sm bg-muted/30 p-2.5 rounded-md border border-muted-foreground/10 text-muted-foreground font-mono leading-relaxed break-all">
-                            {report.location}
                         </div>
                     </div>
 

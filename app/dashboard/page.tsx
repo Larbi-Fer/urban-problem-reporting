@@ -83,7 +83,7 @@ export default function Dashboard() {
         }
     }
 
-    const handleUpdateStatus = async (reportId: string, newStatus: number, teamLeaderId?: string | null) => {
+    const handleUpdateStatus = async (reportId: string, newStatus: number, teamLeaderId?: string | null, isResolvedVal?: boolean | null) => {
         try {
             const statusDate = {
                 ...(newStatus === 1 ? { under_investigation_at: new Date().toISOString() } : {}),
@@ -91,21 +91,25 @@ export default function Dashboard() {
                 ...(newStatus === 3 ? { work_in_progress_at: new Date().toISOString() } : {}),
                 ...(newStatus === 4 ? { resolved_at: new Date().toISOString() } : {})
             }
+            const updatePayload: any = {
+                status: newStatus,
+                ...statusDate
+            }
+            if (isResolvedVal !== undefined) {
+                updatePayload.is_resolved = isResolvedVal
+            }
             const { error } = await supabase
                 .from('reports')
-                .update({
-                    status: newStatus,
-                    ...statusDate
-                })
+                .update(updatePayload)
                 .eq('id', reportId)
 
             if (error) throw error
 
             // Update local state
-            setReports((prev) => prev.map((r) => r.id === reportId ? { ...r, status: newStatus, ...statusDate } : r))
-            setAllReports((prev) => prev.map((r) => r.id === reportId ? { ...r, status: newStatus, ...statusDate } : r))
+            setReports((prev) => prev.map((r) => r.id === reportId ? { ...r, status: newStatus, ...statusDate, ...(isResolvedVal !== undefined ? { is_resolved: isResolvedVal } : {}) } : r))
+            setAllReports((prev) => prev.map((r) => r.id === reportId ? { ...r, status: newStatus, ...statusDate, ...(isResolvedVal !== undefined ? { is_resolved: isResolvedVal } : {}) } : r))
             if (selectedReport?.id === reportId) {
-                setSelectedReport({ ...selectedReport, status: newStatus, ...statusDate })
+                setSelectedReport({ ...selectedReport, status: newStatus, ...statusDate, ...(isResolvedVal !== undefined ? { is_resolved: isResolvedVal } : {}) })
             }
         } catch (err) {
             console.error('Failed to update status', err)

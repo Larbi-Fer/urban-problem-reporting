@@ -11,6 +11,7 @@ export type Report = {
     resolved_at: string | null
     assigned_to_at: string | null
     team_leader: string | null
+    is_resolved: boolean | null
 }
 
 export type Attachment = {

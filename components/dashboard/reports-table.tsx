@@ -71,34 +71,61 @@ export function ReportsTable({ reports, loading, error, onRowClick, selectedId }
                     </TableRow>
                 </TableHeader>
                 <TableBody>
-                    {reports.map((report, i) => (
-                        <TableRow
-                            key={report.id}
-                            className={cn("cursor-pointer hover:bg-muted/50 rise",
-                                selectedId === report.id && "bg-[linear-gradient(to_right,#eee8_0%,#eee2_16%,#eee8_33%,#eee2_50%,#eee8_66%,#eee2_83%,#eee8_100%)] border-neutral-600/50 border-y-2")
-                            }
-                            style={{
-                                '--delay': `${i * 50}ms`
-                            } as React.CSSProperties}
-                            onClick={() => onRowClick(report)}
-                        >
-                            <TableCell className="font-medium">{report.title}</TableCell>
-                            <TableCell>{formatLocation(report.location)}</TableCell>
-                            <TableCell>
-                                <Badge variant="outline" className={statusMap[report.status || 0]?.color}>
-                                    {statusMap[report.status || 0]?.label || 'Unknown'}
-                                </Badge>
-                            </TableCell>
-                            <TableCell>
-                                <Badge variant="outline" className={priorityMap[report.priority || 0]?.color}>
-                                    {priorityMap[report.priority || 0]?.label || 'Unknown'}
-                                </Badge>
-                            </TableCell>
-                            <TableCell className="text-right">
-                                {new Date(report.created_at).toLocaleDateString()}
-                            </TableCell>
-                        </TableRow>
-                    ))}
+                    {(() => {
+                        const sortedReports = [...reports].sort((a, b) => {
+                            const aResolved = !!a.is_resolved;
+                            const bResolved = !!b.is_resolved;
+                            if (aResolved && !bResolved) return -1;
+                            if (!aResolved && bResolved) return 1;
+                            return 0;
+                        });
+
+                        return sortedReports.map((report, i) => {
+                            const isResolved = !!report.is_resolved;
+                            const nextReport = sortedReports[i + 1];
+                            const showSeparator = isResolved && nextReport && !nextReport.is_resolved;
+
+                            return (
+                                <TableRow
+                                    key={report.id}
+                                    className={cn(
+                                        "cursor-pointer hover:bg-muted/50 rise",
+                                        selectedId === report.id && "bg-[linear-gradient(to_right,#eee8_0%,#eee2_16%,#eee8_33%,#eee2_50%,#eee8_66%,#eee2_83%,#eee8_100%)] border-neutral-600/50 border-y-2",
+                                        showSeparator && "border-b-2 border-primary"
+                                    )}
+                                    style={{
+                                        '--delay': `${i * 50}ms`
+                                    } as React.CSSProperties}
+                                    onClick={() => onRowClick(report)}
+                                >
+                                    <TableCell className="font-medium">
+                                        <div className="flex items-center gap-2">
+                                            {report.title}
+                                            {isResolved && (
+                                                <Badge variant="secondary" className="text-[10px] bg-green-500/10 text-green-600 hover:bg-green-500/20 py-0 h-4 border-green-500/20">
+                                                    Resolved by Leader
+                                                </Badge>
+                                            )}
+                                        </div>
+                                    </TableCell>
+                                    <TableCell>{formatLocation(report.location)}</TableCell>
+                                    <TableCell>
+                                        <Badge variant="outline" className={statusMap[report.status || 0]?.color}>
+                                            {statusMap[report.status || 0]?.label || 'Unknown'}
+                                        </Badge>
+                                    </TableCell>
+                                    <TableCell>
+                                        <Badge variant="outline" className={priorityMap[report.priority || 0]?.color}>
+                                            {priorityMap[report.priority || 0]?.label || 'Unknown'}
+                                        </Badge>
+                                    </TableCell>
+                                    <TableCell className="text-right">
+                                        {new Date(report.created_at).toLocaleDateString()}
+                                    </TableCell>
+                                </TableRow>
+                            );
+                        });
+                    })()}
                 </TableBody>
             </Table>
         </div>

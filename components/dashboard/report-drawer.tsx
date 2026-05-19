@@ -30,7 +30,7 @@ import {
     SelectTrigger,
     SelectValue,
 } from '@/components/ui/select'
-import { Loader2, Save, ClipboardList, Search, Wrench, CheckCircle2 } from 'lucide-react'
+import { Loader2, Save, ClipboardList, Search, Wrench, CheckCircle2, BadgeIcon } from 'lucide-react'
 import { Report, Attachment, statusMap } from './types'
 import {
     Timeline,
@@ -56,6 +56,12 @@ function ReportTimeline({ report }: { report: Report }) {
             description: 'Authorities are reviewing the report.',
             date: report.under_investigation_at,
             icon: <Search className="h-2.5 w-2.5" />,
+        },
+        {
+            label: 'Leader assigned',
+            description: 'A team leader has been assigned to the report.',
+            date: report.assigned_to_at,
+            icon: <BadgeIcon className="h-2.5 w-2.5" />
         },
         {
             label: 'Work in Progress',
@@ -118,7 +124,7 @@ interface ReportDrawerProps {
     isOpen: boolean
     onOpenChange: (open: boolean) => void
     getImageUrl: (path: string) => string
-    onUpdateStatus: (reportId: string, newStatus: number, teamLeaderId?: string | null) => Promise<void>
+    onUpdateStatus: (reportId: string, newStatus: number, teamLeaderId?: string | null, isResolvedVal?: boolean | null) => Promise<void>
     onUpdatePriority: (reportId: string, newPriority: number) => Promise<void>
 }
 
@@ -136,6 +142,31 @@ export function ReportDrawer({
     const [editedPriority, setEditedPriority] = useState<string | null>(null)
     const [isSaving, setIsSaving] = useState(false)
     const [isSavingPriority, setIsSavingPriority] = useState(false)
+    const [isSavingResolution, setIsSavingResolution] = useState(false)
+
+    const handleAcceptWork = async () => {
+        if (!report) return
+        setIsSavingResolution(true)
+        try {
+            await onUpdateStatus(report.id, 4, null, false)
+        } catch (err) {
+            console.error('Failed to accept work:', err)
+        } finally {
+            setIsSavingResolution(false)
+        }
+    }
+
+    const handleRejectWork = async () => {
+        if (!report) return
+        setIsSavingResolution(true)
+        try {
+            await onUpdateStatus(report.id, 2, report.team_leader, false)
+        } catch (err) {
+            console.error('Failed to reject work:', err)
+        } finally {
+            setIsSavingResolution(false)
+        }
+    }
 
     const [leaders, setLeaders] = useState<any[]>([])
     const [isLeaderDialogOpen, setIsLeaderDialogOpen] = useState(false)
@@ -234,6 +265,40 @@ export function ReportDrawer({
 
                     {report && (
                         <div className="space-y-6">
+                            {report.is_resolved && (
+                                <div className="bg-emerald-50 border border-emerald-200 dark:bg-emerald-950/20 dark:border-emerald-500/20 rounded-lg p-4 flex flex-col gap-3 relative overflow-hidden">
+                                    <div className="flex items-start gap-3">
+                                        <div className="p-2 bg-emerald-500/20 rounded-full text-emerald-600 dark:text-emerald-400 shrink-0 mt-0.5">
+                                            <CheckCircle2 className="h-5 w-5 animate-pulse" />
+                                        </div>
+                                        <div>
+                                            <h4 className="font-semibold text-sm text-emerald-800 dark:text-emerald-300">Resolution Pending Approval</h4>
+                                            <p className="text-xs text-emerald-700/90 dark:text-emerald-400/90 mt-0.5">
+                                                The team leader has marked this issue as resolved. Please review their work and decide whether to accept or reject the resolution.
+                                            </p>
+                                        </div>
+                                    </div>
+                                    <div className="flex items-center gap-2 self-end">
+                                        <Button
+                                            size="sm"
+                                            variant="destructive"
+                                            onClick={handleRejectWork}
+                                            disabled={isSavingResolution}
+                                            className="h-8 text-xs font-semibold px-4 border border-red-500/30"
+                                        >
+                                            Reject Work
+                                        </Button>
+                                        <Button
+                                            size="sm"
+                                            onClick={handleAcceptWork}
+                                            disabled={isSavingResolution}
+                                            className="h-8 text-xs font-semibold px-4 bg-emerald-600 hover:bg-emerald-700 text-white border border-emerald-600"
+                                        >
+                                            Accept Work
+                                        </Button>
+                                    </div>
+                                </div>
+                            )}
                             <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center bg-muted/30 p-4 rounded-lg border">
                                 <div className="flex items-start gap-3">
                                     <span className="text-sm font-medium text-muted-foreground w-16 mt-1.5">Status:</span>
@@ -253,8 +318,8 @@ export function ReportDrawer({
                                                     <SelectItem value="0">New</SelectItem>
                                                     <SelectItem value="1">Under Investigation</SelectItem>
                                                     <SelectItem value="2">Assign a leader</SelectItem>
-                                                    <SelectItem value="3">Work in Progress</SelectItem>
-                                                    <SelectItem value="4">Resolved</SelectItem>
+                                                    <SelectItem value="3" disabled>Work in Progress</SelectItem>
+                                                    <SelectItem value="4" disabled>Resolved</SelectItem>
                                                 </SelectContent>
                                             </Select>
                                             {editedStatus !== null && editedStatus !== currentStatusStr && (
@@ -272,9 +337,11 @@ export function ReportDrawer({
                                         {report?.team_leader && (
                                             <div className="text-xs text-muted-foreground mt-1.5 flex items-center gap-1.5">
                                                 <span>Assigned to: <span className="font-semibold text-foreground">{leaders.find(l => l.id === report.team_leader)?.user_metadata?.name || 'Unknown Leader'}</span></span>
-                                                <Button variant="link" className="h-auto p-0 text-xs text-primary" onClick={() => setIsLeaderDialogOpen(true)}>
-                                                    (Change)
-                                                </Button>
+                                                {parseInt(displayStatus) == 2 &&
+                                                    <Button variant="link" className="h-auto p-0 text-xs text-primary" onClick={() => setIsLeaderDialogOpen(true)}>
+                                                        (Change)
+                                                    </Button>
+                                                }
                                             </div>
                                         )}
                                     </div>
