@@ -20,6 +20,7 @@ export default function Dashboard() {
 
     const [statusFilter, setStatusFilter] = useState<string>('all')
     const [priorityFilter, setPriorityFilter] = useState<string>('all')
+    const [dateFilter, setDateFilter] = useState<string>('all')
 
     const [selectedReport, setSelectedReport] = useState<Report | null>(null)
     const [isSheetOpen, setIsSheetOpen] = useState(false)
@@ -53,6 +54,40 @@ export default function Dashboard() {
             }
             if (priorityFilter !== 'all') {
                 query = query.eq('priority', parseInt(priorityFilter))
+            }
+
+            if (dateFilter !== 'all') {
+                const now = new Date()
+                const today = new Date(now.getFullYear(), now.getMonth(), now.getDate())
+                
+                if (dateFilter === 'today') {
+                    query = query.gte('created_at', today.toISOString())
+                } else if (dateFilter === 'yesterday') {
+                    const yesterday = new Date(today)
+                    yesterday.setDate(yesterday.getDate() - 1)
+                    query = query.gte('created_at', yesterday.toISOString()).lt('created_at', today.toISOString())
+                } else if (dateFilter === 'this_week') {
+                    const thisWeekStart = new Date(today)
+                    const day = thisWeekStart.getDay()
+                    const diff = thisWeekStart.getDate() - day + (day === 0 ? -6 : 1)
+                    thisWeekStart.setDate(diff)
+                    query = query.gte('created_at', thisWeekStart.toISOString())
+                } else if (dateFilter === 'last_week') {
+                    const thisWeekStart = new Date(today)
+                    const day = thisWeekStart.getDay()
+                    const diff = thisWeekStart.getDate() - day + (day === 0 ? -6 : 1)
+                    thisWeekStart.setDate(diff)
+                    const lastWeekStart = new Date(thisWeekStart)
+                    lastWeekStart.setDate(lastWeekStart.getDate() - 7)
+                    query = query.gte('created_at', lastWeekStart.toISOString()).lt('created_at', thisWeekStart.toISOString())
+                } else if (dateFilter === 'this_month') {
+                    const thisMonthStart = new Date(now.getFullYear(), now.getMonth(), 1)
+                    query = query.gte('created_at', thisMonthStart.toISOString())
+                } else if (dateFilter === 'last_month') {
+                    const lastMonthStart = new Date(now.getFullYear(), now.getMonth() - 1, 1)
+                    const thisMonthStart = new Date(now.getFullYear(), now.getMonth(), 1)
+                    query = query.gte('created_at', lastMonthStart.toISOString()).lt('created_at', thisMonthStart.toISOString())
+                }
             }
 
             const { data, error } = await query
@@ -137,7 +172,7 @@ export default function Dashboard() {
 
     useEffect(() => {
         fetchReports()
-    }, [statusFilter, priorityFilter])
+    }, [statusFilter, priorityFilter, dateFilter])
 
     const handleRowClick = (report: Report) => {
         setSelectedReport(report)
@@ -173,6 +208,8 @@ export default function Dashboard() {
                     setStatusFilter={setStatusFilter}
                     priorityFilter={priorityFilter}
                     setPriorityFilter={setPriorityFilter}
+                    dateFilter={dateFilter}
+                    setDateFilter={setDateFilter}
                 />
             </div>
 

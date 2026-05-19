@@ -14,6 +14,8 @@ interface DashboardFiltersProps {
     setStatusFilter: (val: string) => void
     priorityFilter: string
     setPriorityFilter: (val: string) => void
+    dateFilter: string
+    setDateFilter: (val: string) => void
 }
 
 export function DashboardFilters({
@@ -21,6 +23,8 @@ export function DashboardFilters({
     setStatusFilter,
     priorityFilter,
     setPriorityFilter,
+    dateFilter,
+    setDateFilter,
 }: DashboardFiltersProps) {
     return (
         <div className="flex flex-wrap gap-4">
@@ -56,6 +60,22 @@ export function DashboardFilters({
                         <SelectItem value="1">Medium</SelectItem>
                         <SelectItem value="2">High</SelectItem>
                         <SelectItem value="3">Critical</SelectItem>
+                    </SelectContent>
+                </Select>
+            </div>
+            <div className="w-40 pan d4">
+                <Select value={dateFilter} onValueChange={setDateFilter}>
+                    <SelectTrigger>
+                        <SelectValue placeholder="Filter by Date" />
+                    </SelectTrigger>
+                    <SelectContent>
+                        <SelectItem value="all">All Time</SelectItem>
+                        <SelectItem value="today">Today</SelectItem>
+                        <SelectItem value="yesterday">Yesterday</SelectItem>
+                        <SelectItem value="this_week">This week</SelectItem>
+                        <SelectItem value="last_week">Last week</SelectItem>
+                        <SelectItem value="this_month">This month</SelectItem>
+                        <SelectItem value="last_month">Last month</SelectItem>
                     </SelectContent>
                 </Select>
             </div>
