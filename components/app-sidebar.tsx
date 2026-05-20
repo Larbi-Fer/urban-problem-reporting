@@ -60,7 +60,7 @@ export function AppSidebar() {
             <Shield className="h-5 w-5" />
           </div>
           <div className="flex flex-col">
-            <span className="text-sm font-bold tracking-tight">Urban Care</span>
+            <span className="text-sm font-bold tracking-tight" style={{ fontFamily: "'Noto Sans Arabic', sans-serif" }}>إنشغالاتي</span>
             <span className="text-[10px] text-muted-foreground font-normal">Admin Panel</span>
           </div>
         </div>
