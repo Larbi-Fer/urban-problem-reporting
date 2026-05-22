@@ -59,7 +59,7 @@ export default function Dashboard() {
             if (dateFilter !== 'all') {
                 const now = new Date()
                 const today = new Date(now.getFullYear(), now.getMonth(), now.getDate())
-                
+
                 if (dateFilter === 'today') {
                     query = query.gte('created_at', today.toISOString())
                 } else if (dateFilter === 'yesterday') {
@@ -200,7 +200,7 @@ export default function Dashboard() {
         <div className="container mx-auto py-10 px-4 sm:px-8">
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
                 <div className='fade'>
-                    <h1 className="text-3xl font-bold tracking-tight">Urban Issues Dashboard</h1>
+                    <h1 className="text-3xl font-bold tracking-tight bg-linear-to-br from-neutral-900 via-neutral-900/70 to-neutral-900 bg-clip-text text-transparent">Urban Issues Dashboard</h1>
                     <p className="text-muted-foreground mt-1">Manage and view reported problems</p>
                 </div>
                 <DashboardFilters

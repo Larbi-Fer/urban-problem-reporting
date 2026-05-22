@@ -39,7 +39,7 @@ export default function Statistics() {
                     <Skeleton className="h-9 w-64 mb-2" />
                     <Skeleton className="h-5 w-80" />
                 </div>
-                
+
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
                     {[1, 2, 3].map(i => <Skeleton key={i} className="h-[140px] w-full rounded-2xl" />)}
                 </div>
@@ -66,10 +66,10 @@ export default function Statistics() {
     return (
         <div className="container mx-auto py-10 px-4 sm:px-8">
             <div className="mb-6 fade">
-                <h1 className="text-3xl font-bold tracking-tight">Statistics Overview</h1>
+                <h1 className="text-3xl font-bold w-fit tracking-tight bg-linear-to-tr from-neutral-900 via-neutral-900/70 to-neutral-900 bg-clip-text text-transparent">Statistics Overview</h1>
                 <p className="text-muted-foreground mt-1">Monthly report metrics and trends</p>
             </div>
-            
+
             <MonthlyCards reports={reports} />
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-8">
