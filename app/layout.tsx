@@ -3,6 +3,7 @@ import { Geist, Geist_Mono, Inter, Public_Sans } from "next/font/google";
 import "./globals.css";
 import './animations.css'
 import { cn } from "@/lib/utils";
+import { TooltipProvider } from "@/components/ui/tooltip";
 
 const publicSansHeading = Public_Sans({ subsets: ['latin'], variable: '--font-heading' });
 
@@ -33,7 +34,9 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        {children}
+        <TooltipProvider>
+          {children}
+        </TooltipProvider>
       </body>
     </html>
   );

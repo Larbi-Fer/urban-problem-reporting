@@ -10,6 +10,8 @@ import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { ReportDetails } from '@/components/map/report-details'
+import { AppSidebar } from '@/components/app-sidebar'
+import MapSidebar from '@/components/map/map-sidebar'
 // We need to import getCoordinates type safely. Wait, getCoordinates is exported from map-viewer, but importing it directly from a dynamic component file might be problematic if it imports Leaflet on server.
 // It's safer to recreate getCoordinates here or move it to a utils file. I will recreate it here to avoid SSR issues with Leaflet from the map-viewer file.
 
@@ -191,6 +193,8 @@ export default function MapPage() {
 
     return (
         <div className="w-full h-screen flex flex-col sm:flex-row bg-background overflow-hidden">
+            {/* Sidebar */}
+            <MapSidebar />
             {/* Sidebar for List */}
             <Button onClick={() => setOpenPanel(!openPanel)} variant='secondary'
                 className={`absolute top-1/2 hidden sm:block h-20 w-5 bg-neutral-200/60 rounded-none z-20 p-0 transition-all duration-300 border-r border-2 border-gray-300 font-bold
