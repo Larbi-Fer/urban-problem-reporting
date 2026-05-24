@@ -126,5 +126,10 @@
   }
   html {
     @apply font-sans;
+    scroll-behavior: smooth;
   }
+}
+
+.font-arabic {
+  font-family: 'Noto Sans Arabic', 'Segoe UI', Tahoma, sans-serif;
 }
