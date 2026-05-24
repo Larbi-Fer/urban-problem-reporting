@@ -15,8 +15,8 @@ export default function FinalCTA() {
 
   return (
     <SectionWrapper className="py-20 sm:py-28 relative overflow-hidden">
-      {/* Dark green gradient background */}
-      <div className="absolute inset-0 bg-gradient-to-br from-[#004d20] via-[#007A33] to-[#00A651]" />
+      {/* Dark green linear-gradient background */}
+      <div className="absolute inset-0 bg-linear-to-br from-[#004d20] via-[#007A33] to-[#00A651]" />
 
       {/* Glow effects */}
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-[#00A651]/20 rounded-full blur-[200px]" />
@@ -27,7 +27,7 @@ export default function FinalCTA() {
       <div
         className="absolute inset-0 opacity-5"
         style={{
-          backgroundImage: `radial-gradient(circle, white 1px, transparent 1px)`,
+          backgroundImage: `radial-linear(circle, white 1px, transparent 1px)`,
           backgroundSize: "40px 40px",
         }}
       />

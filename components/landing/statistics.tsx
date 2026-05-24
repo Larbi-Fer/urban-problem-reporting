@@ -111,7 +111,7 @@ export default function Statistics() {
                 className="relative group bg-white rounded-2xl border border-[#E5E7EB] p-6 sm:p-8 text-center shadow-sm hover:shadow-xl transition-all duration-300"
               >
                 {/* Gradient border on hover */}
-                <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-[#007A33]/10 to-[#00A651]/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300 -z-10 blur-sm" />
+                <div className="absolute inset-0 rounded-2xl bg-linear-to-br from-[#007A33]/10 to-[#00A651]/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300 -z-10 blur-sm" />
 
                 <div
                   className={`inline-flex items-center justify-center w-14 h-14 rounded-2xl ${stat.bgColor} mb-4`}

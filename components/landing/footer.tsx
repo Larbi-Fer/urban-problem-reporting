@@ -49,7 +49,7 @@ export default function Footer() {
   return (
     <footer className="bg-[#0a0a0a] text-white relative overflow-hidden">
       {/* Subtle gradient glow */}
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[2px] bg-gradient-to-r from-transparent via-[#007A33]/50 to-transparent" />
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[2px] bg-linear-to-r from-transparent via-[#007A33]/50 to-transparent" />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
         <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-12">
@@ -62,7 +62,7 @@ export default function Footer() {
             className="sm:col-span-2 lg:col-span-1"
           >
             <div className="flex items-center gap-2.5 mb-4">
-              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#007A33] to-[#00A651] flex items-center justify-center shadow-lg shadow-[#007A33]/30">
+              <div className="w-10 h-10 rounded-xl bg-linear-to-br from-[#007A33] to-[#00A651] flex items-center justify-center shadow-lg shadow-[#007A33]/30">
                 <span className="text-white font-bold text-base">إ</span>
               </div>
               <span className="text-xl font-bold tracking-tight">
@@ -158,7 +158,7 @@ export default function Footer() {
             </h3>
             <a
               href="#download-app"
-              className="inline-flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-[#007A33] to-[#00A651] text-white text-sm font-semibold rounded-xl hover:shadow-lg hover:shadow-[#007A33]/25 transition-all duration-300"
+              className="inline-flex items-center gap-2 px-5 py-2.5 bg-linear-to-r from-[#007A33] to-[#00A651] text-white text-sm font-semibold rounded-xl hover:shadow-lg hover:shadow-[#007A33]/25 transition-all duration-300"
             >
               <svg viewBox="0 0 24 24" className="w-5 h-5 fill-current">
                 <path d="M3,20.5V3.5C3,2.91 3.34,2.39 3.84,2.15L13.69,12L3.84,21.85C3.34,21.61 3,21.09 3,20.5M16.81,15.12L6.05,21.34L14.54,12.85L16.81,15.12M20.16,10.81C20.5,11.08 20.75,11.5 20.75,12C20.75,12.5 20.5,12.92 20.16,13.19L17.89,14.5L15.39,12L17.89,9.5L20.16,10.81M6.05,2.66L16.81,8.88L14.54,11.15L6.05,2.66Z" />

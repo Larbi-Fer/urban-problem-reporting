@@ -16,10 +16,10 @@ export default function Hero() {
   return (
     <section
       id="home"
-      className="relative min-h-screen flex items-center overflow-hidden pt-20"
+      className="relative min-h-screen flex items-center overflow-hidden pt-20 h-[calc(100%+140px)]"
     >
       {/* Background */}
-      <div className="absolute inset-0 bg-gradient-to-br from-[#F5F5F2] via-white to-[#e8f5e9]" />
+      <div className="absolute inset-0 bg-linear-to-br from-[#F5F5F2] via-white to-[#e8f5e9]" />
 
       {/* Mesh gradient blobs */}
       <div className="absolute top-20 left-10 w-[500px] h-[500px] bg-[#007A33]/10 rounded-full blur-[120px] animate-pulse" />
@@ -69,7 +69,7 @@ export default function Hero() {
 
             <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-[#111827] leading-tight">
               {t.hero.headline}
-              <span className="block mt-2 bg-gradient-to-r from-[#007A33] to-[#00A651] bg-clip-text text-transparent">
+              <span className="block mt-2 bg-linear-to-r from-[#007A33] to-[#00A651] bg-clip-text text-transparent">
                 {language === "ar" ? "إنشغالاتي" : "Inchighalati"}
               </span>
             </h1>
@@ -83,7 +83,7 @@ export default function Hero() {
                 whileHover={{ scale: 1.02, y: -2 }}
                 whileTap={{ scale: 0.98 }}
                 onClick={() => handleScrollTo("#features")}
-                className="flex items-center gap-2 px-8 py-4 bg-gradient-to-r from-[#007A33] to-[#00A651] text-white font-semibold rounded-2xl shadow-xl shadow-[#007A33]/25 hover:shadow-2xl hover:shadow-[#007A33]/30 transition-all duration-300 cursor-pointer"
+                className="flex items-center gap-2 px-8 py-4 bg-linear-to-r from-[#007A33] to-[#00A651] text-white font-semibold rounded-2xl shadow-xl shadow-[#007A33]/25 hover:shadow-2xl hover:shadow-[#007A33]/30 transition-all duration-300 cursor-pointer"
               >
                 {t.hero.cta}
                 <ArrowDown size={18} className="animate-bounce" />
@@ -141,7 +141,7 @@ export default function Hero() {
           >
             <div className="relative">
               {/* Glow behind phone */}
-              <div className="absolute inset-0 bg-gradient-to-br from-[#007A33]/20 to-[#00A651]/20 rounded-[3rem] blur-[60px] scale-110" />
+              <div className="absolute inset-0 bg-linear-to-br from-[#007A33]/20 to-[#00A651]/20 rounded-[3rem] blur-[60px] scale-110" />
 
               {/* Phone container with 3D transform */}
               <motion.div
@@ -176,20 +176,17 @@ export default function Hero() {
                         width={320}
                         height={680}
                         className="w-full h-auto object-cover"
-                        style={{
-                          backgroundAttachment: "fixed"
-                        }}
                         priority
                       />
 
                       {/* Glass reflection overlay */}
-                      <div className="absolute inset-0 bg-gradient-to-br from-white/20 via-transparent to-transparent pointer-events-none" />
-                      <div className="absolute inset-0 bg-gradient-to-tl from-white/10 via-transparent to-transparent pointer-events-none" />
+                      <div className="absolute inset-0 bg-linear-to-br from-white/20 via-transparent to-transparent pointer-events-none" />
+                      <div className="absolute inset-0 bg-linear-to-tl from-white/10 via-transparent to-transparent pointer-events-none" />
                     </div>
                   </div>
 
                   {/* Side shadow for 3D depth */}
-                  <div className="absolute -right-2 top-4 bottom-4 w-3 bg-gradient-to-r from-[#1a1a2e] to-transparent rounded-r-lg opacity-40" />
+                  <div className="absolute -right-2 top-4 bottom-4 w-3 bg-linear-to-r from-[#1a1a2e] to-transparent rounded-r-lg opacity-40" />
                 </div>
               </motion.div>
 
