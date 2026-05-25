@@ -52,6 +52,8 @@ export default function ReportProblemPage() {
             const { data: { user } } = await supabase.auth.getUser()
             if (!user) {
                 return router.push('/login')
+            } else if (user.user_metadata.role === 'admin') {
+                return router.push('/dashboard')
             }
             setUser(user)
         })()

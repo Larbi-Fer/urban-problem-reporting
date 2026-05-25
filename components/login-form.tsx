@@ -1,6 +1,5 @@
 'use client'
 
-import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 
 import { cn } from '@/lib/utils'
@@ -13,16 +12,40 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
+import { useRouter } from 'next/navigation'
 import Link from 'next/link'
+import { Input } from './ui/input'
+import { Label } from './ui/label'
+import Image from 'next/image'
 
 export function LoginForm({ className, ...props }: React.ComponentPropsWithoutRef<'div'>) {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState<string | null>(null)
   const [isLoading, setIsLoading] = useState(false)
+  const [isLoadingGoogle, setIsLoadingGoogle] = useState(false)
   const router = useRouter()
+
+  const handleSocialLogin = async (e: React.FormEvent) => {
+    e.preventDefault()
+    const supabase = createClient()
+    setIsLoadingGoogle(true)
+    setError(null)
+
+    try {
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: 'google',
+        options: {
+          redirectTo: `${window.location.origin}/auth/oauth?next=/issue`,
+        },
+      })
+
+      if (error) throw error
+    } catch (error: unknown) {
+      setError(error instanceof Error ? error.message : 'An error occurred')
+      setIsLoadingGoogle(false)
+    }
+  }
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -52,8 +75,8 @@ export function LoginForm({ className, ...props }: React.ComponentPropsWithoutRe
     <div className={cn('flex flex-col gap-6', className)} {...props}>
       <Card>
         <CardHeader>
-          <CardTitle className="text-2xl">Login</CardTitle>
-          <CardDescription>Enter your email below to login to your account</CardDescription>
+          <CardTitle className="text-2xl">Welcome!</CardTitle>
+          <CardDescription>Sign in to your account to continue</CardDescription>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleLogin}>
@@ -88,7 +111,7 @@ export function LoginForm({ className, ...props }: React.ComponentPropsWithoutRe
                 />
               </div>
               {error && <p className="text-sm text-red-500">{error}</p>}
-              <Button type="submit" className="w-full" disabled={isLoading}>
+              <Button type="submit" className="w-full" disabled={isLoading || isLoadingGoogle}>
                 {isLoading ? 'Logging in...' : 'Login'}
               </Button>
             </div>
@@ -97,6 +120,17 @@ export function LoginForm({ className, ...props }: React.ComponentPropsWithoutRe
               <Link href="/auth/sign-up" className="underline underline-offset-4">
                 Sign up
               </Link>
+            </div>
+          </form>
+          <form onSubmit={handleSocialLogin}>
+            <div className="flex flex-col gap-6 mt-10">
+              {error && <p className="text-sm text-destructive-500">{error}</p>}
+              <Button type="submit" className="w-full rounded-full" disabled={isLoadingGoogle || isLoading} variant='outline'>
+                {isLoadingGoogle ? 'Logging in...' : <>
+                  <Image src='/icons/google2.png' alt="Google" width={30} height={30} />
+                  Continue with Google
+                </>}
+              </Button>
             </div>
           </form>
         </CardContent>
