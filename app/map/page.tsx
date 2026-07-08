@@ -67,7 +67,6 @@ export default function MapPage() {
     const supabase = createClient()
 
     useEffect(() => {
-        document.body.style.overflow = 'hidden'
         const fetchReports = async () => {
             try {
                 const { data, error } = await supabase
@@ -87,6 +86,8 @@ export default function MapPage() {
     }, [])
 
     const handleBoundsChange = useCallback((bounds: any, center: any) => {
+        console.log('Bounds changed', { bounds, center });
+
         setMapBounds(bounds)
         setMapCenter(center)
     }, [])
@@ -175,7 +176,7 @@ export default function MapPage() {
             // bounds.contains needs LatLng object, but we can do a simple bound check manually or use Leaflet.
             // Since we receive bounds object from Leaflet, it has contains() method.
             try {
-                return mapBounds.contains([lat, lng])
+                return mapBounds.contains({ lat, lng })
             } catch (e) {
                 return false
             }

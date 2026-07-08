@@ -1,10 +1,13 @@
 'use client'
 
-import { useEffect } from 'react'
-import { MapContainer, TileLayer, Marker, useMapEvents, useMap } from 'react-leaflet'
+import { useEffect, useRef } from 'react'
 import 'leaflet/dist/leaflet.css'
 import L from 'leaflet'
 import { Report } from '@/components/dashboard/types'
+import { Card } from '../ui/card'
+import { Map, MapControls, MapMarker, MapRef, MarkerContent, MarkerTooltip, useMap } from '../ui/map'
+import { MapPinIcon } from 'lucide-react'
+import { LngLat, LngLatBounds } from 'maplibre-gl'
 
 // ----- Custom SVG marker icons -----
 // Leaflet requires L.DivIcon / L.Icon objects — React elements cannot be used here.
@@ -34,31 +37,44 @@ const selectedIcon = createMarkerIcon(true)
 // ----- Map sub-components -----
 interface MapViewerProps {
     reports: Report[]
-    onBoundsChange?: (bounds: L.LatLngBounds, center: L.LatLng) => void
+    onBoundsChange?: (bounds: LngLatBounds, center: LngLat) => void
     selectedReportId?: string | null
     onReportSelect?: (report: Report) => void
 }
 
-function MapEvents({ onBoundsChange }: { onBoundsChange?: (bounds: L.LatLngBounds, center: L.LatLng) => void }) {
-    const map = useMapEvents({
-        moveend: () => {
-            if (onBoundsChange) {
-                onBoundsChange(map.getBounds(), map.getCenter())
-            }
-        }
-    })
+function MapEvents({ onBoundsChange }: { onBoundsChange?: (bounds: LngLatBounds, center: LngLat) => void }) {
+    const { map, isLoaded } = useMap();
+
+    // const map = useMapEvents({
+    //     moveend: () => {
+    //         if (onBoundsChange) {
+    //             onBoundsChange(map.getBounds(), map.getCenter())
+    //         }
+    //     }
+    // })
 
     useEffect(() => {
-        if (map && onBoundsChange) {
-            onBoundsChange(map.getBounds(), map.getCenter())
+        if (!map || !isLoaded) return;
+
+        const handleMove = () => {
+            if (onBoundsChange) {
+                onBoundsChange(map.getBounds(), map.getCenter());
+            }
         }
-    }, [map, onBoundsChange])
+
+        // Also listen to moveend events
+        map.on('moveend', handleMove);
+
+        return () => {
+            map.off('moveend', handleMove);
+        };
+    }, [map, isLoaded, onBoundsChange])
 
     return null
 }
 
 function MapFocus({ selectedReportId, reports }: { selectedReportId?: string | null, reports: Report[] }) {
-    const map = useMap()
+    const { map } = useMap()
 
     useEffect(() => {
         if (selectedReportId) {
@@ -66,7 +82,7 @@ function MapFocus({ selectedReportId, reports }: { selectedReportId?: string | n
             if (report) {
                 const coords = getCoordinates(report.location)
                 if (coords) {
-                    map.flyTo(coords, 16, { duration: 1.5 })
+                    map?.flyTo({ center: [coords[1], coords[0]], zoom: 15, duration: 1500 })
                 }
             }
         }
@@ -78,6 +94,8 @@ function MapFocus({ selectedReportId, reports }: { selectedReportId?: string | n
 // ----- Main component -----
 export default function MapViewer({ reports, onBoundsChange, selectedReportId, onReportSelect }: MapViewerProps) {
     const defaultCenter: [number, number] = [36.7525, 3.04197]
+    const mapRef = useRef<MapRef>(null);
+
 
     const firstValidReport = reports.find(r => getCoordinates(r.location) !== null)
     const mapCenter = firstValidReport
@@ -85,17 +103,10 @@ export default function MapViewer({ reports, onBoundsChange, selectedReportId, o
         : defaultCenter
 
     return (
-        <div className="w-full h-full relative z-0">
-            <MapContainer
-                center={mapCenter}
-                zoom={12}
-                scrollWheelZoom={true}
-                className="w-full h-full absolute inset-0"
-            >
-                <TileLayer
-                    attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-                    url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-                />
+        <Card className="w-full h-full relative z-0 p-0 rounded-none">
+            <Map center={[-2.221791572088887, 31.60790662046916]} zoom={14} theme='light' ref={mapRef}>
+                {/* <Map center={[31, -2]} zoom={12} theme='light'> */}
+                <MapControls position="top-left" />
                 <MapEvents onBoundsChange={onBoundsChange} />
                 <MapFocus selectedReportId={selectedReportId} reports={reports} />
                 {reports.map((report) => {
@@ -105,21 +116,28 @@ export default function MapViewer({ reports, onBoundsChange, selectedReportId, o
                     const isSelected = report.id === selectedReportId
 
                     return (
-                        <Marker
+                        <MapMarker
                             key={report.id}
-                            position={coords}
-                            icon={isSelected ? selectedIcon : defaultIcon}
-                            zIndexOffset={isSelected ? 1000 : 0}
-                            eventHandlers={{
-                                click: () => {
-                                    if (onReportSelect) onReportSelect(report)
-                                }
+                            longitude={coords[1]}
+                            latitude={coords[0]}
+                            onClick={() => {
+                                if (onReportSelect) onReportSelect(report)
+                                // mapRef.current?.flyTo({ center: [coords[1], coords[0]], zoom: 15, duration: 1500 })
                             }}
-                        />
+                        >
+                            <MarkerContent className={isSelected ? 'z-1000' : 'z-10'}>
+                                {isSelected ?
+                                    <MapPinIcon fill='#ccf' stroke='#f55' size={30} className='-translate-y-3.5' />
+                                    :
+                                    <MapPinIcon fill='#ccf' stroke='#55f' className='-translate-y-3' />
+                                }
+                            </MarkerContent>
+                            <MarkerTooltip>{report.title}</MarkerTooltip>
+                        </MapMarker>
                     )
                 })}
-            </MapContainer>
-        </div>
+            </Map>
+        </Card>
     )
 }
 
